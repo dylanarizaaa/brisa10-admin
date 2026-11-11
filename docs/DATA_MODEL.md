@@ -164,6 +164,12 @@ Una sola fila (`id boolean primary key default true check (id)`).
 | low_stock_threshold | integer | default 5, `check (>= 0)`; umbral global de bajo inventario |
 | updated_at | timestamptz | |
 
+## Vistas
+
+| Vista | Hace |
+|-------|------|
+| `product_list` | Productos con nombre de categoría, mínimo efectivo (`effective_min_stock`), estado de existencias (`stock_status`: `disponible`, `bajo`, `agotado`), ruta de la foto principal y `search_text` (nombre + SKU en minúsculas y sin tildes). `security_invoker`: respeta el RLS de las tablas. No incluye el costo. Solo lectura. |
+
 ## Funciones de consulta
 
 | Función | Hace | Rol |

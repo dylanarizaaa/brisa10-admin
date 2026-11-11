@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Skeleton } from '@/components/ui/skeleton'
 import { useCurrentUser } from '@/features/auth/auth-context'
 import { usePagination } from '@/hooks/use-pagination'
+import { normalizeText } from '@/lib/text'
 import { CategoriesTable } from '../components/categories-table'
 import { CategoryFormDialog } from '../components/category-form-dialog'
 import { useCategories, useSetCategoryActive } from '../hooks/use-categories'
@@ -22,10 +23,6 @@ type DialogState =
   | { type: 'deactivate'; category: Category }
   | null
 
-function normalize(text: string): string {
-  return text.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase()
-}
-
 export function CategoriesPage() {
   const { isAdmin } = useCurrentUser()
   const categories = useCategories()
@@ -35,11 +32,11 @@ export function CategoriesPage() {
   const [dialog, setDialog] = useState<DialogState>(null)
 
   const filtered = useMemo(() => {
-    const term = normalize(search.trim())
+    const term = normalizeText(search.trim())
     return (categories.data ?? []).filter(
       (category) =>
         (status === 'all' || category.is_active === (status === 'active')) &&
-        (!term || normalize(category.name).includes(term)),
+        (!term || normalizeText(category.name).includes(term)),
     )
   }, [categories.data, search, status])
 
