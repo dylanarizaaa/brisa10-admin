@@ -74,7 +74,7 @@ Reglas:
 - **Los servicios** son funciones asíncronas planas que devuelven datos tipados y lanzan errores; no conocen React.
 - **Los hooks** envuelven servicios con TanStack Query: claves de caché, invalidación y notificaciones.
 - **Los esquemas Zod** definen la forma de cada formulario; los tipos se infieren de ellos.
-- **Dependencias entre features:** una feature puede usar servicios/hooks de otra (ventas usa productos), pero no sus componentes internos. Lo compartido sube a `components/shared` o `lib`.
+- **Dependencias entre features:** una feature puede usar servicios, hooks y componentes de presentación de otra cuando representan el mismo concepto (inventario reutiliza los filtros, la miniatura y el indicador de existencias de productos). Lo genérico, sin dominio, sube a `components/shared` o `lib`.
 
 ## Decisiones relevantes
 

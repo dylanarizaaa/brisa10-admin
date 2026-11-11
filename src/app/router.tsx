@@ -7,6 +7,7 @@ import { LoginPage } from '@/features/auth/pages/login-page'
 import { CategoriesPage } from '@/features/categories/pages/categories-page'
 import { RequireAdmin } from '@/features/auth/components/require-admin'
 import { DashboardPage } from '@/features/dashboard/pages/dashboard-page'
+import { InventoryPage } from '@/features/inventory/pages/inventory-page'
 import { ProductDetailPage } from '@/features/products/pages/product-detail-page'
 import { ProductCreatePage, ProductEditPage } from '@/features/products/pages/product-form-page'
 import { ProductsPage } from '@/features/products/pages/products-page'
@@ -17,6 +18,7 @@ const pages: Record<string, ReactNode> = {
   '/': <DashboardPage />,
   '/categorias': <CategoriesPage />,
   '/productos': <ProductsPage />,
+  '/inventario': <InventoryPage />,
 }
 
 export const router = createBrowserRouter([

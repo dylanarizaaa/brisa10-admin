@@ -27,6 +27,8 @@ export const productSchema = z.object({
     .pipe(wholeNumber('El precio')),
   cost: optionalWholeNumber('El costo'),
   minStock: optionalWholeNumber('El stock mínimo'),
+  /** Solo al crear: se registra como una entrada de inventario. */
+  initialStock: optionalWholeNumber('Las existencias iniciales'),
 })
 
 export type ProductValues = z.infer<typeof productSchema>

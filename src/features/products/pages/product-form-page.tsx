@@ -13,7 +13,7 @@ export function ProductCreatePage() {
       <BackLink to="/productos">Productos</BackLink>
       <PageHeader
         title="Nuevo producto"
-        description="Después de crearlo podrás agregar sus fotografías. Las existencias se registran desde Inventario."
+        description="Después de crearlo podrás agregar sus fotografías."
       />
       <ProductForm
         submitting={save.isPending}
