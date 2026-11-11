@@ -9,6 +9,8 @@ export type MovementType = 'entrada' | 'salida' | 'ajuste' | 'venta' | 'cancelac
 export type SaleStatus = 'completada' | 'anulada'
 export type PaymentMethod = 'efectivo' | 'transferencia' | 'nequi' | 'daviplata' | 'tarjeta' | 'otro'
 
+export type StockStatus = 'disponible' | 'bajo' | 'agotado'
+
 export type DashboardSummary = {
   total_products: number
   available_products: number
@@ -272,7 +274,30 @@ export type Database = {
         Relationships: []
       }
     }
-    Views: Record<never, never>
+    Views: {
+      product_list: {
+        Row: {
+          id: string
+          sku: string | null
+          name: string
+          description: string | null
+          category_id: string
+          category_name: string
+          price: number
+          stock: number
+          min_stock: number | null
+          effective_min_stock: number
+          stock_status: StockStatus
+          is_active: boolean
+          is_published: boolean
+          created_at: string
+          updated_at: string
+          main_image_path: string | null
+          search_text: string
+        }
+        Relationships: []
+      }
+    }
     Functions: {
       get_dashboard_summary: { Args: Record<never, never>; Returns: DashboardSummary }
       is_active_user: { Args: Record<never, never>; Returns: boolean }
@@ -289,3 +314,4 @@ export type Database = {
 }
 
 export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row']
+export type Views<T extends keyof Database['public']['Views']> = Database['public']['Views'][T]['Row']
