@@ -13,9 +13,9 @@ Cada fase deja el proyecto funcional y se valida antes de pasar a la siguiente.
 | 1 | Autenticación + migración inicial de base de datos | ✅ Hecho |
 | 2 | Dashboard y categorías | ✅ Hecho |
 | 3 | Productos e imágenes | ✅ Hecho |
-| 4 | Inventario transaccional | ✅ Hecho — pendiente de tu prueba contra Supabase |
-| 5 | Ventas físicas | ⏳ Siguiente |
-| 6 | Historial, reportes, permisos y configuración | Pendiente |
+| 4 | Inventario transaccional | ✅ Hecho |
+| 5 | Ventas físicas | ✅ Hecho — pendiente de tu prueba contra Supabase |
+| 6 | Historial, reportes, permisos y configuración | ⏳ Siguiente |
 | 7 | Empaquetado con Tauri 2 | Pendiente |
 
 ## Paso 0 — Base del proyecto (este entregable)
@@ -60,10 +60,11 @@ Cada fase deja el proyecto funcional y se valida antes de pasar a la siguiente.
 
 ## Fase 5 — Ventas físicas
 
-- Punto de venta: buscar productos, carrito, cantidades, subtotales y total en COP, método de pago.
-- Función RPC `create_sale`: crea venta + ítems + movimientos y descuenta stock en una sola transacción.
-- Historial de ventas con detalle. Anulación con `cancel_sale` (devuelve el stock).
-- Indicadores de ventas del dashboard.
+- Punto de venta (`/ventas/nueva`): buscar productos activos, carrito con cantidades limitadas a las existencias, subtotales y total en COP, método de pago, notas y confirmación.
+- Función RPC `create_sale`: crea venta + ítems + movimientos y descuenta stock en una sola transacción, con los precios de la base de datos.
+- Historial de ventas con filtros por fecha, método de pago y estado, y detalle de cada venta.
+- Anulación con `cancel_sale` (solo administrador, exige motivo): devuelve el stock y deja la venta registrada como anulada.
+- Dashboard: productos más vendidos de los últimos 30 días (`get_top_products`).
 
 ## Fase 6 — Historial, reportes y permisos
 

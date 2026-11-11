@@ -175,6 +175,9 @@ Una sola fila (`id boolean primary key default true check (id)`).
 | Función | Hace | Rol |
 |---------|------|-----|
 | `get_dashboard_summary()` | Devuelve en un solo viaje los contadores del dashboard: productos registrados, disponibles, agotados, con bajo inventario, inactivos, y ventas e ingresos del día (hora de Colombia). Respeta RLS. | Ambos |
+| `get_top_products(days, limit)` | Productos más vendidos (unidades e ingresos) de los últimos `days` días, solo ventas completadas. Respeta RLS. | Ambos |
+
+`sale_number` puede tener saltos, porque un intento de venta rechazado (por ejemplo, sin existencias suficientes) consume un número.
 
 Un producto está en **bajo inventario** cuando está activo, tiene existencias y estas son menores o iguales a su `min_stock` (o al umbral global si no tiene uno propio).
 
@@ -187,8 +190,8 @@ Las funciones públicas son `SECURITY DEFINER`: verifican sesión, usuario activ
 | `register_inventory_movement(product_id, type, quantity, reason)` | Entrada, salida o devolución. `quantity` siempre es positivo; la función decide el signo. La salida exige motivo y falla si no hay existencias suficientes. | Ambos | 4 |
 | `adjust_inventory(product_id, new_stock, reason)` | Ajuste manual: fija las existencias al valor contado (no recibe la diferencia). Exige motivo. | Admin | 4 |
 | `apply_stock_change(product_id, type, delta, reason, sale_id)` | Interna: no se puede llamar desde el frontend. | — | 4 |
-| `create_sale(items, payment_method, notes)` | Valida productos activos y stock suficiente, toma el precio **desde la base de datos** (no del cliente), crea venta + ítems + movimientos `venta` y descuenta stock. Todo o nada. | Ambos | 5 |
-| `cancel_sale(sale_id, reason)` | Marca la venta como anulada, devuelve el stock y registra movimientos `cancelacion`. | Admin | 5 |
+| `create_sale(items, payment_method, notes)` | `items` es `[{product_id, quantity}]`. Bloquea los productos en orden fijo (evita bloqueos mutuos entre ventas simultáneas), valida que estén activos y con stock suficiente, toma el precio **desde la base de datos** (ignora cualquier precio enviado), crea venta + ítems + movimientos `venta` y descuenta stock. Todo o nada. | Ambos | 5 |
+| `cancel_sale(sale_id, reason)` | Bloquea la venta (no se puede anular dos veces), devuelve el stock con movimientos `cancelacion` y la marca como anulada con motivo, usuario y fecha. | Admin | 5 |
 
 `devolucion` está disponible en `register_inventory_movement`, pero la interfaz todavía no la ofrece; no se modela un flujo de devoluciones más complejo en esta etapa.
 

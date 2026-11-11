@@ -5,6 +5,7 @@ import { useCurrentUser } from '@/features/auth/auth-context'
 import { formatCOP } from '@/lib/format'
 import { RecentActivity } from '../components/recent-activity'
 import { StatCard } from '../components/stat-card'
+import { TopProducts } from '../components/top-products'
 import { useDashboardSummary } from '../hooks/use-dashboard'
 
 export function DashboardPage() {
@@ -64,7 +65,10 @@ export function DashboardPage() {
         </>
       )}
 
-      <RecentActivity />
+      <div className="grid items-start gap-4 lg:grid-cols-2">
+        <TopProducts />
+        <RecentActivity />
+      </div>
     </div>
   )
 }
