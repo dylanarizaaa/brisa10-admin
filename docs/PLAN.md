@@ -9,9 +9,9 @@ Cada fase deja el proyecto funcional y se valida antes de pasar a la siguiente.
 
 | Paso | Contenido | Estado |
 |------|-----------|--------|
-| 0 | Planeación, arquitectura, modelo de datos (documentos) y base del proyecto configurada | ✅ Hecho — pendiente de validación |
-| 1 | Autenticación + migración inicial de base de datos | ⏳ Siguiente |
-| 2 | Dashboard y categorías | Pendiente |
+| 0 | Planeación, arquitectura, modelo de datos (documentos) y base del proyecto configurada | ✅ Hecho |
+| 1 | Autenticación + migración inicial de base de datos | ✅ Hecho — pendiente de tu prueba contra Supabase |
+| 2 | Dashboard y categorías | ⏳ Siguiente |
 | 3 | Productos e imágenes | Pendiente |
 | 4 | Inventario transaccional | Pendiente |
 | 5 | Ventas físicas | Pendiente |
@@ -27,7 +27,6 @@ Cada fase deja el proyecto funcional y se valida antes de pasar a la siguiente.
 - Validación de variables de entorno y `.env.example`.
 - Documentos: este plan, [arquitectura](./ARCHITECTURE.md) y [modelo de datos](./DATA_MODEL.md).
 
-No incluye todavía: login, migraciones SQL ni ningún módulo funcional.
 
 ## Fase 1 — Autenticación y base de datos
 
@@ -74,13 +73,12 @@ No incluye todavía: login, migraciones SQL ni ningún módulo funcional.
 - `src-tauri/`, configuración de ventana, iconos y build del instalador para Windows.
 - Sin funcionalidades nativas adicionales.
 
-## Decisiones que necesito que valides
+## Decisiones tomadas
 
-Están propuestas con un valor por defecto en los documentos; dime si alguna debe cambiar antes de la fase 1.
-
-1. **Permisos del operador.** Propuesta: registra ventas y entradas/salidas de mercancía y consulta todo; solo el administrador hace ajustes manuales, anula ventas, edita productos/categorías, y gestiona usuarios y configuración. Ver matriz en [DATA_MODEL.md](./DATA_MODEL.md#permisos-por-rol).
-2. **Métodos de pago.** Propuesta: efectivo, transferencia, Nequi, Daviplata, tarjeta, otro.
-3. **Nombre del negocio.** Usé "Brisa10" por el nombre del repositorio; es editable.
-4. **Proyecto de Supabase.** Necesito que crees un proyecto (plan gratuito) y tengas a mano la URL y la clave `anon`. Las migraciones se aplican con Supabase CLI o pegándolas en el editor SQL.
-5. **Alta de usuarios.** Crear usuarios requiere la clave `service_role`, que no puede estar en el frontend. Propuesta: crearlos desde el panel de Supabase y administrar su rol/estado desde la app. Alternativa (más trabajo): una Edge Function de invitación.
-6. **Código de producto (SKU / código de barras).** No está en los requisitos. Propuesta: campo `sku` opcional y único, útil para buscar rápido en ventas.
+1. **Permisos del operador:** registra ventas y entradas/salidas, consulta todo. Ajustes, anulaciones, edición de productos/categorías, usuarios y configuración: solo administrador.
+2. **Costo de adquisición:** solo lo ve el administrador (tabla `product_costs`).
+3. **Métodos de pago:** efectivo, transferencia, Nequi, Daviplata, tarjeta, otro.
+4. **Alta de usuarios:** desde el panel de Supabase; el primero queda como administrador. Rol y estado se administran desde la app (fase 6).
+5. **SKU:** campo opcional y único.
+6. **Fotos:** bucket público de Storage; solo el administrador escribe.
+7. **Migraciones:** las aplicas tú en el editor SQL de Supabase; el frontend solo usa la clave `anon`.
