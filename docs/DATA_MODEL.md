@@ -1,6 +1,6 @@
 # Modelo de datos inicial
 
-Implementado en `supabase/migrations/20261111000001_initial_schema.sql`. Las funciones RPC llegan en las fases 4 y 5.
+Implementado en `supabase/migrations/`. Las funciones RPC de inventario y ventas llegan en las fases 4 y 5.
 
 ## Diagrama
 
@@ -163,6 +163,14 @@ Una sola fila (`id boolean primary key default true check (id)`).
 | nit, phone, address, email | text | opcionales |
 | low_stock_threshold | integer | default 5, `check (>= 0)`; umbral global de bajo inventario |
 | updated_at | timestamptz | |
+
+## Funciones de consulta
+
+| Función | Hace | Rol |
+|---------|------|-----|
+| `get_dashboard_summary()` | Devuelve en un solo viaje los contadores del dashboard: productos registrados, disponibles, agotados, con bajo inventario, inactivos, y ventas e ingresos del día (hora de Colombia). Respeta RLS. | Ambos |
+
+Un producto está en **bajo inventario** cuando está activo, tiene existencias y estas son menores o iguales a su `min_stock` (o al umbral global si no tiene uno propio).
 
 ## Funciones RPC (transaccionales)
 

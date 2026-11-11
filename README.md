@@ -3,7 +3,7 @@
 Sistema administrativo para una tienda física: productos, categorías, inventario y ventas.
 Aplicación React que corre como web durante el desarrollo y se empaquetará con Tauri 2 para Windows.
 
-> **Estado:** fase 1 completa (base de datos y autenticación). Los módulos funcionales se implementan por fases — ver [docs/PLAN.md](docs/PLAN.md).
+> **Estado:** fases 1 y 2 completas (base de datos, autenticación, dashboard y categorías). Los módulos funcionales se implementan por fases — ver [docs/PLAN.md](docs/PLAN.md).
 
 ## Documentación
 
@@ -29,12 +29,17 @@ npm run dev            # http://localhost:5173
 
 Se hace una sola vez, en el panel de tu proyecto y **en este orden**:
 
-1. **SQL Editor → New query:** pega el contenido completo de `supabase/migrations/20261111000001_initial_schema.sql` y pulsa **Run**. Debe terminar con "Success. No rows returned".
+1. **SQL Editor → New query:** pega el contenido completo de cada archivo de `supabase/migrations/`, **uno por uno y en orden de nombre**, y pulsa **Run**. Cada uno debe terminar con "Success. No rows returned".
 2. **Authentication → Sign In / Providers → Email:** desactiva **Allow new users to sign up**, para que nadie pueda registrarse por su cuenta.
 3. **Authentication → Users → Add user → Create new user:** escribe correo y contraseña y marca **Auto Confirm User**. El primer usuario queda como **administrador**; los siguientes, como operador.
 4. Verifica en **Table Editor → profiles** que tu usuario aparece con `role = admin`.
 
-Cada fase posterior que traiga cambios de base de datos agrega un archivo nuevo en `supabase/migrations/`; se aplica igual (paso 1), en orden de nombre. Cada archivo se ejecuta una sola vez.
+Cada fase que trae cambios de base de datos agrega un archivo nuevo; se aplica igual (paso 1). Cada archivo se ejecuta una sola vez.
+
+| Migración | Fase | Contenido |
+|-----------|------|-----------|
+| `20261111000001_initial_schema.sql` | 1 | Tablas, RLS, privilegios, bucket de imágenes y datos iniciales |
+| `20261111000002_dashboard_summary.sql` | 2 | Función de indicadores del dashboard |
 
 Para cambiar un rol a mano: `update public.profiles set role = 'admin' where id = '<uuid del usuario>';`
 

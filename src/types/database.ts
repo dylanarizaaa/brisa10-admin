@@ -9,6 +9,16 @@ export type MovementType = 'entrada' | 'salida' | 'ajuste' | 'venta' | 'cancelac
 export type SaleStatus = 'completada' | 'anulada'
 export type PaymentMethod = 'efectivo' | 'transferencia' | 'nequi' | 'daviplata' | 'tarjeta' | 'otro'
 
+export type DashboardSummary = {
+  total_products: number
+  available_products: number
+  out_of_stock_products: number
+  low_stock_products: number
+  inactive_products: number
+  sales_today_count: number
+  sales_today_revenue: number
+}
+
 export type Database = {
   public: {
     Tables: {
@@ -264,6 +274,7 @@ export type Database = {
     }
     Views: Record<never, never>
     Functions: {
+      get_dashboard_summary: { Args: Record<never, never>; Returns: DashboardSummary }
       is_active_user: { Args: Record<never, never>; Returns: boolean }
       is_admin: { Args: Record<never, never>; Returns: boolean }
     }
