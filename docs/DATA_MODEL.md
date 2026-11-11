@@ -1,6 +1,6 @@
 # Modelo de datos inicial
 
-Propuesta para validar. Las migraciones SQL se escriben en la fase 1 a partir de este documento.
+Implementado en `supabase/migrations/20261111000001_initial_schema.sql`. Las funciones RPC llegan en las fases 4 y 5.
 
 ## Diagrama
 
@@ -8,6 +8,7 @@ Propuesta para validar. Las migraciones SQL se escriben en la fase 1 a partir de
 auth.users ──1:1── profiles
                       │ (created_by)
 categories ──1:N── products ──1:N── product_images
+                      │ └──1:1── product_costs (solo admin)
                       │
                       ├──1:N── inventory_movements ──N:1── sales (opcional)
                       │
@@ -62,22 +63,30 @@ Datos iniciales: Cerámicas, Peluches, Decoración, Regalos, Accesorios, Otros.
 | Columna | Tipo | Notas |
 |---------|------|-------|
 | id | uuid PK | |
-| sku | text | opcional, único (*propuesto, por validar*) |
+| sku | text | opcional, único |
 | name | text | not null |
 | description | text | |
 | category_id | uuid | FK → `categories(id)`, on delete restrict |
 | price | integer | not null, `check (price >= 0)` |
-| cost | integer | opcional, `check (cost >= 0)` |
 | stock | integer | not null default 0, **`check (stock >= 0)`** |
 | min_stock | integer | opcional; si es null se usa el umbral global |
 | is_active | boolean | default true |
 | is_published | boolean | default false — para el catálogo futuro |
-| created_by | uuid | FK → `profiles(id)` |
+| created_by | uuid | FK → `profiles(id)`, se asigna solo (`auth.uid()`) |
 | created_at, updated_at | timestamptz | |
 
 Índices: `category_id`, `is_active`, parcial `(is_published) where is_published and is_active`, y trigram sobre `name` para la búsqueda.
 
 `stock` no es editable desde el frontend: el rol `authenticated` no recibe permiso `UPDATE` sobre esa columna. Solo cambian las funciones RPC.
+
+### product_costs
+Costo de adquisición (opcional). Va en tabla aparte porque RLS no puede ocultar una sola columna y el costo solo lo ve el administrador.
+
+| Columna | Tipo | Notas |
+|---------|------|-------|
+| product_id | uuid PK | FK → `products(id)` on delete cascade |
+| cost | integer | not null, `check (cost >= 0)` |
+| updated_at | timestamptz | |
 
 ### product_images
 Las fotos viven en Supabase Storage (bucket `product-images`); aquí solo se guarda la ruta.
@@ -182,13 +191,16 @@ RLS activado en todas las tablas. Dos funciones auxiliares: `is_active_user()` y
 | Ajuste manual de inventario (RPC) | ❌ | ✅ |
 | Registrar venta (RPC) | ✅ | ✅ |
 | Anular venta (RPC) | ❌ | ✅ |
-| Ver costo de adquisición | ❌ *(por validar)* | ✅ |
+| Ver y editar costo de adquisición | ❌ | ✅ |
 | Configuración del negocio y usuarios | Solo lectura de datos del negocio | ✅ |
 | Editar su propio nombre | ✅ | ✅ |
 
 - `sales`, `sale_items` e `inventory_movements`: solo `SELECT` para usuarios autenticados; ninguna política de escritura (se escriben únicamente desde las RPC).
 - Un usuario no puede cambiar su propio `role` ni `is_active`.
-- Storage: lectura del bucket `product-images` para autenticados; escritura solo admin.
+- Un administrador no puede cambiar su propio rol ni desactivarse (evita quedarse sin administradores).
+- El primer usuario creado en Supabase Auth queda como `admin`; los siguientes, como `operador`.
+- Storage: el bucket `product-images` es **público** (las fotos se muestran por URL directa, con rutas no adivinables, y están destinadas al catálogo). Subir, reemplazar y borrar: solo admin. Límite de 5 MB; JPEG, PNG o WebP.
+- El rol `anon` no tiene ningún privilegio sobre las tablas.
 
 ## Preparación para el catálogo público (no se implementa ahora)
 

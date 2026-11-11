@@ -3,7 +3,7 @@
 Sistema administrativo para una tienda física: productos, categorías, inventario y ventas.
 Aplicación React que corre como web durante el desarrollo y se empaquetará con Tauri 2 para Windows.
 
-> **Estado:** base del proyecto configurada. Los módulos funcionales se implementan por fases — ver [docs/PLAN.md](docs/PLAN.md).
+> **Estado:** fase 1 completa (base de datos y autenticación). Los módulos funcionales se implementan por fases — ver [docs/PLAN.md](docs/PLAN.md).
 
 ## Documentación
 
@@ -15,7 +15,7 @@ Aplicación React que corre como web durante el desarrollo y se empaquetará con
 
 - Node.js 20.19 o superior (probado con 22)
 - npm 10 o superior
-- Un proyecto de Supabase (a partir de la fase 1)
+- Un proyecto de Supabase
 
 ## Instalación
 
@@ -24,6 +24,19 @@ npm install
 cp .env.example .env   # completar con la URL y la clave anon de Supabase
 npm run dev            # http://localhost:5173
 ```
+
+## Configurar Supabase
+
+Se hace una sola vez, en el panel de tu proyecto y **en este orden**:
+
+1. **SQL Editor → New query:** pega el contenido completo de `supabase/migrations/20261111000001_initial_schema.sql` y pulsa **Run**. Debe terminar con "Success. No rows returned".
+2. **Authentication → Sign In / Providers → Email:** desactiva **Allow new users to sign up**, para que nadie pueda registrarse por su cuenta.
+3. **Authentication → Users → Add user → Create new user:** escribe correo y contraseña y marca **Auto Confirm User**. El primer usuario queda como **administrador**; los siguientes, como operador.
+4. Verifica en **Table Editor → profiles** que tu usuario aparece con `role = admin`.
+
+Cada fase posterior que traiga cambios de base de datos agrega un archivo nuevo en `supabase/migrations/`; se aplica igual (paso 1), en orden de nombre. Cada archivo se ejecuta una sola vez.
+
+Para cambiar un rol a mano: `update public.profiles set role = 'admin' where id = '<uuid del usuario>';`
 
 ## Scripts
 
