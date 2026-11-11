@@ -51,7 +51,11 @@ export function useSaveProduct() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async ({ id, values }: { id?: string; values: ProductValues }) => {
-      if (!id) return createProduct(values)
+      if (!id) {
+        const created = await createProduct(values)
+        created.warnings.forEach((warning) => toast.warning(warning))
+        return created.id
+      }
       await updateProduct(id, values)
       return id
     },

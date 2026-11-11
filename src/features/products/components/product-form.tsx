@@ -69,6 +69,7 @@ export function ProductForm({ product, submitting, error, cancelTo, onSubmit }: 
       price: product ? String(product.price) : '',
       cost: product?.cost != null ? String(product.cost) : '',
       minStock: product?.min_stock != null ? String(product.min_stock) : '',
+      initialStock: '',
     },
   })
 
@@ -167,6 +168,25 @@ export function ProductForm({ product, submitting, error, cancelTo, onSubmit }: 
           />
         </Field>
       </div>
+
+      {!product && (
+        <div className="grid gap-5 sm:grid-cols-3">
+          <Field
+            id="product-initial-stock"
+            label="Existencias iniciales"
+            optional
+            hint="Unidades que tienes hoy. Se registran como una entrada de inventario."
+            error={errors.initialStock?.message}
+          >
+            <Input
+              id="product-initial-stock"
+              inputMode="numeric"
+              aria-invalid={Boolean(errors.initialStock)}
+              {...register('initialStock')}
+            />
+          </Field>
+        </div>
+      )}
 
       {error && (
         <p role="alert" className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">

@@ -12,9 +12,9 @@ Cada fase deja el proyecto funcional y se valida antes de pasar a la siguiente.
 | 0 | Planeación, arquitectura, modelo de datos (documentos) y base del proyecto configurada | ✅ Hecho |
 | 1 | Autenticación + migración inicial de base de datos | ✅ Hecho |
 | 2 | Dashboard y categorías | ✅ Hecho |
-| 3 | Productos e imágenes | ✅ Hecho — pendiente de tu prueba contra Supabase |
-| 4 | Inventario transaccional | ⏳ Siguiente |
-| 5 | Ventas físicas | Pendiente |
+| 3 | Productos e imágenes | ✅ Hecho |
+| 4 | Inventario transaccional | ✅ Hecho — pendiente de tu prueba contra Supabase |
+| 5 | Ventas físicas | ⏳ Siguiente |
 | 6 | Historial, reportes, permisos y configuración | Pendiente |
 | 7 | Empaquetado con Tauri 2 | Pendiente |
 
@@ -49,13 +49,14 @@ Cada fase deja el proyecto funcional y se valida antes de pasar a la siguiente.
 - Subida, orden y eliminación de fotografías en Supabase Storage (bucket `product-images`).
 - Vista `product_list` para listar con filtros, estado de existencias y búsqueda sin tildes; paginación en el servidor.
 - Búsqueda global del header (lleva a la lista de productos filtrada).
-- Los productos se crean con existencias en 0. El stock inicial se registrará como un movimiento de entrada cuando exista el módulo de inventario (fase 4), nunca escribiendo la columna directamente.
+- El stock nunca se escribe directamente: las existencias iniciales se registran como un movimiento de entrada (fase 4).
 - `is_published` existe en la base de datos pero no se muestra en la interfaz hasta que haya catálogo público.
 
 ## Fase 4 — Inventario
 
-- Función RPC `register_inventory_movement` (entrada, salida, ajuste) con bloqueo de fila y validación de no-negativos.
-- Pantalla de existencias con alertas de bajo inventario y formularios de entrada/salida/ajuste.
+- Funciones RPC `register_inventory_movement` (entrada, salida) y `adjust_inventory` (ajuste al valor contado, solo administrador), con bloqueo de fila y validación de no-negativos.
+- Pantalla de existencias con avisos de bajo inventario y agotados, y formularios de entrada, salida y ajuste.
+- Campo "Existencias iniciales" al crear un producto: se registra como una entrada de inventario.
 
 ## Fase 5 — Ventas físicas
 

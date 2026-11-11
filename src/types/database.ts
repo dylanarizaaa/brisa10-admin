@@ -300,6 +300,14 @@ export type Database = {
     }
     Functions: {
       get_dashboard_summary: { Args: Record<never, never>; Returns: DashboardSummary }
+      register_inventory_movement: {
+        Args: { p_product_id: string; p_type: MovementType; p_quantity: number; p_reason?: string }
+        Returns: Database['public']['Tables']['inventory_movements']['Row']
+      }
+      adjust_inventory: {
+        Args: { p_product_id: string; p_new_stock: number; p_reason: string }
+        Returns: Database['public']['Tables']['inventory_movements']['Row']
+      }
       is_active_user: { Args: Record<never, never>; Returns: boolean }
       is_admin: { Args: Record<never, never>; Returns: boolean }
     }

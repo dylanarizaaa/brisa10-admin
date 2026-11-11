@@ -180,15 +180,17 @@ Un producto está en **bajo inventario** cuando está activo, tiene existencias 
 
 ## Funciones RPC (transaccionales)
 
-Todas se ejecutan como `SECURITY DEFINER`, verifican sesión, usuario activo y rol, y bloquean las filas de producto con `SELECT … FOR UPDATE` para evitar condiciones de carrera.
+Las funciones públicas son `SECURITY DEFINER`: verifican sesión, usuario activo y rol, y delegan en `apply_stock_change`, que bloquea la fila del producto con `SELECT … FOR UPDATE`, valida que el resultado no sea negativo, actualiza `products.stock` e inserta el movimiento. Los errores de regla de negocio usan SQLSTATE `P0001` con mensaje en español, que la interfaz muestra tal cual.
 
-| Función | Hace | Rol |
-|---------|------|-----|
-| `register_inventory_movement(product_id, type, quantity, reason)` | Entrada, salida o ajuste. Calcula el nuevo stock, falla si quedaría negativo, actualiza `products.stock` e inserta el movimiento. | Entrada/salida: ambos. Ajuste: admin. |
-| `create_sale(items, payment_method, notes)` | Valida productos activos y stock suficiente, toma el precio **desde la base de datos** (no del cliente), crea venta + ítems + movimientos `venta` y descuenta stock. Todo o nada. | Ambos |
-| `cancel_sale(sale_id, reason)` | Marca la venta como anulada, devuelve el stock y registra movimientos `cancelacion`. | Admin |
+| Función | Hace | Rol | Fase |
+|---------|------|-----|------|
+| `register_inventory_movement(product_id, type, quantity, reason)` | Entrada, salida o devolución. `quantity` siempre es positivo; la función decide el signo. La salida exige motivo y falla si no hay existencias suficientes. | Ambos | 4 |
+| `adjust_inventory(product_id, new_stock, reason)` | Ajuste manual: fija las existencias al valor contado (no recibe la diferencia). Exige motivo. | Admin | 4 |
+| `apply_stock_change(product_id, type, delta, reason, sale_id)` | Interna: no se puede llamar desde el frontend. | — | 4 |
+| `create_sale(items, payment_method, notes)` | Valida productos activos y stock suficiente, toma el precio **desde la base de datos** (no del cliente), crea venta + ítems + movimientos `venta` y descuenta stock. Todo o nada. | Ambos | 5 |
+| `cancel_sale(sale_id, reason)` | Marca la venta como anulada, devuelve el stock y registra movimientos `cancelacion`. | Admin | 5 |
 
-`devolucion` (devolución parcial de un producto) queda como tipo de movimiento disponible vía `register_inventory_movement`; no se modela un flujo de devoluciones más complejo en esta etapa.
+`devolucion` está disponible en `register_inventory_movement`, pero la interfaz todavía no la ofrece; no se modela un flujo de devoluciones más complejo en esta etapa.
 
 ## RLS
 

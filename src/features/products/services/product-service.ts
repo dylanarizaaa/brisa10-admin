@@ -1,3 +1,4 @@
+import { registerMovement } from '@/features/inventory/services/inventory-service'
 import { toAppError } from '@/lib/errors'
 import { getSupabase } from '@/lib/supabase'
 import { normalizeText } from '@/lib/text'
@@ -80,12 +81,38 @@ async function saveCost(productId: string, cost: string): Promise<void> {
   if (error) throw new Error('El producto se guardó, pero no se pudo guardar el costo. Edítalo e inténtalo de nuevo')
 }
 
-/** Crea el producto y devuelve su id. Las existencias empiezan en 0: se registran desde Inventario. */
-export async function createProduct(values: ProductValues): Promise<string> {
+export interface CreatedProduct {
+  id: string
+  /** Avisos de pasos secundarios que fallaron después de crear el producto. */
+  warnings: string[]
+}
+
+/**
+ * Crea el producto. El costo y las existencias iniciales se guardan después; si alguno falla,
+ * el producto ya existe, así que se devuelve con un aviso en lugar de lanzar un error.
+ * Las existencias iniciales se registran como un movimiento de entrada, nunca escribiendo stock.
+ */
+export async function createProduct(values: ProductValues): Promise<CreatedProduct> {
   const { data, error } = await getSupabase().from('products').insert(toRow(values)).select('id').single()
   if (error) throw toAppError(error, 'No se pudo crear el producto', saveMessages)
-  if (values.cost !== '') await saveCost(data.id, values.cost)
-  return data.id
+
+  const warnings: string[] = []
+  if (values.cost !== '') {
+    await saveCost(data.id, values.cost).catch(() =>
+      warnings.push('No se pudo guardar el costo. Edita el producto para agregarlo'),
+    )
+  }
+  if (Number(values.initialStock) > 0) {
+    await registerMovement({
+      productId: data.id,
+      type: 'entrada',
+      quantity: Number(values.initialStock),
+      reason: 'Existencias iniciales',
+    }).catch(() =>
+      warnings.push('No se pudieron registrar las existencias iniciales. Regístralas desde Inventario'),
+    )
+  }
+  return { id: data.id, warnings }
 }
 
 export async function updateProduct(id: string, values: ProductValues): Promise<void> {
