@@ -3,7 +3,9 @@ import { PageHeader } from '@/components/shared/page-header'
 import { ErrorState } from '@/components/shared/state-message'
 import { useCurrentUser } from '@/features/auth/auth-context'
 import { formatCOP } from '@/lib/format'
+import { InventoryStatus } from '../components/inventory-status'
 import { RecentActivity } from '../components/recent-activity'
+import { SalesChart } from '../components/sales-chart'
 import { StatCard } from '../components/stat-card'
 import { TopProducts } from '../components/top-products'
 import { useDashboardSummary } from '../hooks/use-dashboard'
@@ -65,7 +67,14 @@ export function DashboardPage() {
         </>
       )}
 
-      <div className="grid items-start gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-3">
+        <div className="min-w-0 lg:col-span-2">
+          <SalesChart />
+        </div>
+        <InventoryStatus summary={summary.isError ? undefined : data} />
+      </div>
+
+      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
         <TopProducts />
         <RecentActivity />
       </div>

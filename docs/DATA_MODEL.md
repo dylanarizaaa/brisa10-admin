@@ -169,6 +169,7 @@ Una sola fila (`id boolean primary key default true check (id)`).
 | Vista | Hace |
 |-------|------|
 | `product_list` | Productos con nombre de categoría, mínimo efectivo (`effective_min_stock`), estado de existencias (`stock_status`: `disponible`, `bajo`, `agotado`), ruta de la foto principal y `search_text` (nombre + SKU en minúsculas y sin tildes). `security_invoker`: respeta el RLS de las tablas. No incluye el costo. Solo lectura. |
+| `movement_list` | Movimientos de inventario con nombre y código del producto, nombre del usuario responsable, número de venta y `search_text`. `security_invoker`. Solo lectura. |
 
 ## Funciones de consulta
 
@@ -176,6 +177,8 @@ Una sola fila (`id boolean primary key default true check (id)`).
 |---------|------|-----|
 | `get_dashboard_summary()` | Devuelve en un solo viaje los contadores del dashboard: productos registrados, disponibles, agotados, con bajo inventario, inactivos, y ventas e ingresos del día (hora de Colombia). Respeta RLS. | Ambos |
 | `get_top_products(days, limit)` | Productos más vendidos (unidades e ingresos) de los últimos `days` días, solo ventas completadas. Respeta RLS. | Ambos |
+| `get_sales_by_day(days)` | Ventas completadas e ingresos de cada uno de los últimos `days` días (hora de Colombia), incluidos los días sin ventas. Respeta RLS. | Ambos |
+| `list_users()` | Perfiles con su correo (que vive en `auth.users`, inaccesible desde el frontend). `SECURITY DEFINER`. | Admin |
 
 `sale_number` puede tener saltos, porque un intento de venta rechazado (por ejemplo, sin existencias suficientes) consume un número.
 
@@ -211,7 +214,10 @@ RLS activado en todas las tablas. Dos funciones auxiliares: `is_active_user()` y
 | Registrar venta (RPC) | ✅ | ✅ |
 | Anular venta (RPC) | ❌ | ✅ |
 | Ver y editar costo de adquisición | ❌ | ✅ |
-| Configuración del negocio y usuarios | Solo lectura de datos del negocio | ✅ |
+| Ver historial de movimientos | ✅ | ✅ |
+| Ver datos del negocio | ✅ | ✅ |
+| Editar datos del negocio y umbral de bajo inventario | ❌ | ✅ |
+| Ver usuarios, cambiar rol, activar o desactivar | ❌ | ✅ |
 | Editar su propio nombre | ✅ | ✅ |
 
 - `sales`, `sale_items` e `inventory_movements`: solo `SELECT` para usuarios autenticados; ninguna política de escritura (se escriben únicamente desde las RPC).

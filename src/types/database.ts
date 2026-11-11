@@ -11,6 +11,22 @@ export type PaymentMethod = 'efectivo' | 'transferencia' | 'nequi' | 'daviplata'
 
 export type StockStatus = 'disponible' | 'bajo' | 'agotado'
 
+export type SalesByDay = {
+  /** Día en formato AAAA-MM-DD (hora de Colombia). */
+  day: string
+  sales_count: number
+  revenue: number
+}
+
+export type UserAccount = {
+  id: string
+  full_name: string
+  email: string
+  role: UserRole
+  is_active: boolean
+  created_at: string
+}
+
 export type TopProduct = {
   product_id: string
   product_name: string
@@ -289,6 +305,26 @@ export type Database = {
       }
     }
     Views: {
+      movement_list: {
+        Row: {
+          id: string
+          product_id: string
+          product_name: string
+          product_sku: string | null
+          type: MovementType
+          quantity: number
+          stock_before: number
+          stock_after: number
+          reason: string | null
+          sale_id: string | null
+          sale_number: number | null
+          created_by: string
+          user_name: string
+          created_at: string
+          search_text: string
+        }
+        Relationships: []
+      }
       product_list: {
         Row: {
           id: string
@@ -333,6 +369,14 @@ export type Database = {
       get_top_products: {
         Args: { p_days?: number; p_limit?: number }
         Returns: TopProduct[]
+      }
+      get_sales_by_day: {
+        Args: { p_days?: number }
+        Returns: SalesByDay[]
+      }
+      list_users: {
+        Args: Record<never, never>
+        Returns: UserAccount[]
       }
       adjust_inventory: {
         Args: { p_product_id: string; p_new_stock: number; p_reason: string }

@@ -14,9 +14,9 @@ Cada fase deja el proyecto funcional y se valida antes de pasar a la siguiente.
 | 2 | Dashboard y categorías | ✅ Hecho |
 | 3 | Productos e imágenes | ✅ Hecho |
 | 4 | Inventario transaccional | ✅ Hecho |
-| 5 | Ventas físicas | ✅ Hecho — pendiente de tu prueba contra Supabase |
-| 6 | Historial, reportes, permisos y configuración | ⏳ Siguiente |
-| 7 | Empaquetado con Tauri 2 | Pendiente |
+| 5 | Ventas físicas | ✅ Hecho |
+| 6 | Historial, reportes, permisos y configuración | ✅ Hecho — pendiente de tu prueba contra Supabase |
+| 7 | Empaquetado con Tauri 2 | ⏳ Siguiente |
 
 ## Paso 0 — Base del proyecto (este entregable)
 
@@ -68,10 +68,13 @@ Cada fase deja el proyecto funcional y se valida antes de pasar a la siguiente.
 
 ## Fase 6 — Historial, reportes y permisos
 
-- Historial de movimientos con filtros (producto, tipo, usuario, fechas).
-- Gráficos del dashboard (ventas por día, más vendidos).
-- Configuración: datos del negocio, umbral de bajo inventario, usuarios y roles.
-- Revisión completa de permisos admin/operador en interfaz y en RLS.
+- Historial de movimientos (vista `movement_list`) con filtros por producto, tipo, usuario y rango de fechas. Solo lectura.
+- Dashboard: gráfico de ingresos por día (últimos 14 días, con vista de tabla) y estado del inventario.
+- Configuración:
+  - **Negocio:** nombre, NIT, teléfono, dirección, correo y umbral de bajo inventario. Solo el administrador edita.
+  - **Usuarios** (solo administrador): cambiar rol, activar y desactivar. El alta de usuarios se hace en el panel de Supabase.
+  - **Mi cuenta:** cambiar el propio nombre.
+- Revisión de permisos: cada restricción de la interfaz tiene su equivalente en RLS o en las funciones RPC (matriz en [DATA_MODEL.md](./DATA_MODEL.md#permisos-por-rol)).
 
 ## Fase 7 — Tauri 2
 

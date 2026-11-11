@@ -11,16 +11,19 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
 import { navigation } from '@/config/navigation'
+import { useBusinessSettings } from '@/features/settings/hooks/use-settings'
 
 export function AppSidebar() {
+  const settings = useBusinessSettings()
+
   return (
     <Sidebar>
       <SidebarHeader>
         <div className="flex items-center gap-2 px-2 py-1.5">
-          <div className="flex size-7 items-center justify-center rounded-md bg-primary text-primary-foreground">
+          <div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground">
             <Store className="size-4" />
           </div>
-          <span className="font-semibold">Brisa10</span>
+          <span className="truncate font-semibold">{settings.data?.business_name ?? 'Brisa10'}</span>
         </div>
       </SidebarHeader>
       <SidebarContent>

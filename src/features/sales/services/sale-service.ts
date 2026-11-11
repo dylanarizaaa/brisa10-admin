@@ -1,22 +1,8 @@
+import { isDateString, startOfDay, startOfNextDay } from '@/lib/dates'
 import { toAppError } from '@/lib/errors'
 import { getSupabase } from '@/lib/supabase'
 import type { PaymentMethod } from '@/types/database'
 import { SALES_PAGE_SIZE, type SaleDetail, type SaleFilters, type SalePage } from '../types'
-
-// Colombia no tiene horario de verano: su desfase con UTC es siempre -05:00.
-const BOGOTA_OFFSET = '-05:00'
-
-function startOfDay(date: string): string {
-  return `${date}T00:00:00${BOGOTA_OFFSET}`
-}
-
-function startOfNextDay(date: string): string {
-  const next = new Date(`${date}T00:00:00Z`)
-  next.setUTCDate(next.getUTCDate() + 1)
-  return startOfDay(next.toISOString().slice(0, 10))
-}
-
-const isDate = (value: string) => /^\d{4}-\d{2}-\d{2}$/.test(value)
 
 export async function listSales(filters: SaleFilters): Promise<SalePage> {
   let query = getSupabase()
@@ -25,8 +11,8 @@ export async function listSales(filters: SaleFilters): Promise<SalePage> {
 
   if (filters.status !== 'all') query = query.eq('status', filters.status)
   if (filters.payment !== 'all') query = query.eq('payment_method', filters.payment)
-  if (isDate(filters.from)) query = query.gte('created_at', startOfDay(filters.from))
-  if (isDate(filters.to)) query = query.lt('created_at', startOfNextDay(filters.to))
+  if (isDateString(filters.from)) query = query.gte('created_at', startOfDay(filters.from))
+  if (isDateString(filters.to)) query = query.lt('created_at', startOfNextDay(filters.to))
 
   const from = (filters.page - 1) * SALES_PAGE_SIZE
   const { data, error, count } = await query
