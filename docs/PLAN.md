@@ -10,9 +10,9 @@ Cada fase deja el proyecto funcional y se valida antes de pasar a la siguiente.
 | Paso | Contenido | Estado |
 |------|-----------|--------|
 | 0 | Planeación, arquitectura, modelo de datos (documentos) y base del proyecto configurada | ✅ Hecho |
-| 1 | Autenticación + migración inicial de base de datos | ✅ Hecho — pendiente de tu prueba contra Supabase |
-| 2 | Dashboard y categorías | ⏳ Siguiente |
-| 3 | Productos e imágenes | Pendiente |
+| 1 | Autenticación + migración inicial de base de datos | ✅ Hecho |
+| 2 | Dashboard y categorías | ✅ Hecho — pendiente de tu prueba contra Supabase |
+| 3 | Productos e imágenes | ⏳ Siguiente |
 | 4 | Inventario transaccional | Pendiente |
 | 5 | Ventas físicas | Pendiente |
 | 6 | Historial, reportes, permisos y configuración | Pendiente |
@@ -41,7 +41,7 @@ Cada fase deja el proyecto funcional y se valida antes de pasar a la siguiente.
 
 - CRUD de categorías (crear, editar, activar/desactivar) — primer módulo completo, fija el patrón del resto.
 - Componentes compartidos: tabla de datos con paginación, diálogo de confirmación, estados vacío/carga/error.
-- Dashboard con indicadores reales de productos e inventario. Los indicadores de ventas se conectan en la fase 5.
+- Dashboard con indicadores reales (función `get_dashboard_summary`) y actividad reciente. Las ventas del día ya se consultan; mostrarán datos cuando exista el módulo de ventas (fase 5). Productos más vendidos y gráficos: fases 5 y 6.
 
 ## Fase 3 — Productos e imágenes
 
