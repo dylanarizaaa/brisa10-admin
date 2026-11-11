@@ -11,7 +11,11 @@ import { InventoryPage } from '@/features/inventory/pages/inventory-page'
 import { ProductDetailPage } from '@/features/products/pages/product-detail-page'
 import { ProductCreatePage, ProductEditPage } from '@/features/products/pages/product-form-page'
 import { ProductsPage } from '@/features/products/pages/products-page'
+import { NewSalePage } from '@/features/sales/pages/new-sale-page'
+import { SaleDetailPage } from '@/features/sales/pages/sale-detail-page'
+import { SalesPage } from '@/features/sales/pages/sales-page'
 import { AppLayout } from './layouts/app-layout'
+import { RouteError } from './route-error'
 
 /** Páginas ya implementadas; el resto de la navegación muestra un placeholder. */
 const pages: Record<string, ReactNode> = {
@@ -19,12 +23,14 @@ const pages: Record<string, ReactNode> = {
   '/categorias': <CategoriesPage />,
   '/productos': <ProductsPage />,
   '/inventario': <InventoryPage />,
+  '/ventas': <SalesPage />,
 }
 
 export const router = createBrowserRouter([
-  { path: '/login', element: <LoginPage /> },
+  { path: '/login', element: <LoginPage />, errorElement: <RouteError /> },
   {
     element: <RequireAuth />,
+    errorElement: <RouteError />,
     children: [
       {
         path: '/',
@@ -42,6 +48,8 @@ export const router = createBrowserRouter([
             ],
           },
           { path: '/productos/:id', element: <ProductDetailPage /> },
+          { path: '/ventas/nueva', element: <NewSalePage /> },
+          { path: '/ventas/:id', element: <SaleDetailPage /> },
           { path: '*', element: <Navigate to="/" replace /> },
         ],
       },

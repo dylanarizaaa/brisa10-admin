@@ -1,20 +1,13 @@
-import { useCallback, useMemo } from 'react'
-import { useSearchParams } from 'react-router'
+import { useMemo } from 'react'
+import { oneOf, useUrlParams } from '@/hooks/use-url-params'
 import type { ActiveFilter, AvailabilityFilter, ProductFilters } from '../types'
 
 const availabilityValues: AvailabilityFilter[] = ['all', 'in_stock', 'low', 'out']
 const activeValues: ActiveFilter[] = ['all', 'active', 'inactive']
 
-function oneOf<T extends string>(value: string | null, allowed: T[], fallback: T): T {
-  return allowed.includes(value as T) ? (value as T) : fallback
-}
-
-/**
- * Filtros de la lista de productos guardados en la URL:
- * sobreviven a recargar, al botón atrás y se pueden compartir.
- */
+/** Filtros de la lista de productos, guardados en la URL. */
 export function useProductFilters() {
-  const [params, setParams] = useSearchParams()
+  const { params, page, setParam } = useUrlParams<'q' | 'categoria' | 'existencias' | 'estado'>()
 
   const filters = useMemo<ProductFilters>(
     () => ({
@@ -22,26 +15,9 @@ export function useProductFilters() {
       categoryId: params.get('categoria'),
       availability: oneOf(params.get('existencias'), availabilityValues, 'all'),
       active: oneOf(params.get('estado'), activeValues, 'all'),
-      page: Math.max(1, Number.parseInt(params.get('pagina') ?? '1', 10) || 1),
+      page,
     }),
-    [params],
-  )
-
-  /** Cambia un parámetro; cualquier cambio de filtro vuelve a la primera página. */
-  const setParam = useCallback(
-    (key: 'q' | 'categoria' | 'existencias' | 'estado' | 'pagina', value: string | null) => {
-      setParams(
-        (current) => {
-          const next = new URLSearchParams(current)
-          if (value === null || value === '' || value === 'all') next.delete(key)
-          else next.set(key, value)
-          if (key !== 'pagina') next.delete('pagina')
-          return next
-        },
-        { replace: true },
-      )
-    },
-    [setParams],
+    [params, page],
   )
 
   const hasFilters =

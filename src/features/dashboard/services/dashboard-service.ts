@@ -1,5 +1,6 @@
 import { toAppError } from '@/lib/errors'
 import { getSupabase } from '@/lib/supabase'
+import type { TopProduct } from '@/types/database'
 import type { DashboardSummary, RecentMovement } from '../types'
 
 export async function getDashboardSummary(): Promise<DashboardSummary> {
@@ -24,4 +25,14 @@ export async function getRecentMovements(limit = 8): Promise<RecentMovement[]> {
     product_name: products.name,
     user_name: profiles.full_name,
   }))
+}
+
+export async function getTopProducts(days: number, limit: number): Promise<TopProduct[]> {
+  const { data, error } = await getSupabase().rpc('get_top_products', { p_days: days, p_limit: limit })
+  if (error) {
+    throw toAppError(error, 'No se pudieron cargar los productos más vendidos', {
+      PGRST202: 'Falta aplicar la migración de ventas en Supabase (20261111000005_sales.sql)',
+    })
+  }
+  return data
 }

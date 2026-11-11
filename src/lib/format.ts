@@ -17,3 +17,9 @@ export function formatCOP(value: number): string {
 export function formatDateTime(value: string | Date): string {
   return dateTimeFormatter.format(typeof value === 'string' ? new Date(value) : value)
 }
+
+const dateFormatter = new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium' })
+
+export function formatDate(value: string | Date): string {
+  return dateFormatter.format(typeof value === 'string' ? new Date(value) : value)
+}

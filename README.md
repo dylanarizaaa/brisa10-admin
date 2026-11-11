@@ -3,7 +3,7 @@
 Sistema administrativo para una tienda física: productos, categorías, inventario y ventas.
 Aplicación React que corre como web durante el desarrollo y se empaquetará con Tauri 2 para Windows.
 
-> **Estado:** fases 1 a 4 completas (base de datos, autenticación, dashboard, categorías, productos con fotografías e inventario). Los módulos funcionales se implementan por fases — ver [docs/PLAN.md](docs/PLAN.md).
+> **Estado:** fases 1 a 5 completas (base de datos, autenticación, dashboard, categorías, productos con fotografías, inventario y ventas). Los módulos funcionales se implementan por fases — ver [docs/PLAN.md](docs/PLAN.md).
 
 ## Documentación
 
@@ -42,6 +42,7 @@ Cada fase que trae cambios de base de datos agrega un archivo nuevo; se aplica i
 | `20261111000002_dashboard_summary.sql` | 2 | Función de indicadores del dashboard |
 | `20261111000003_product_list.sql` | 3 | Vista para listar, filtrar y buscar productos |
 | `20261111000004_inventory_movements.sql` | 4 | Funciones transaccionales de entrada, salida y ajuste de inventario |
+| `20261111000005_sales.sql` | 5 | Funciones para registrar y anular ventas, y productos más vendidos |
 
 Para cambiar un rol a mano: `update public.profiles set role = 'admin' where id = '<uuid del usuario>';`
 

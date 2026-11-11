@@ -11,6 +11,13 @@ export type PaymentMethod = 'efectivo' | 'transferencia' | 'nequi' | 'daviplata'
 
 export type StockStatus = 'disponible' | 'bajo' | 'agotado'
 
+export type TopProduct = {
+  product_id: string
+  product_name: string
+  units: number
+  revenue: number
+}
+
 export type DashboardSummary = {
   total_products: number
   available_products: number
@@ -181,6 +188,13 @@ export type Database = {
             referencedRelation: 'profiles'
             referencedColumns: ['id']
           },
+          {
+            foreignKeyName: 'sales_cancelled_by_fkey'
+            columns: ['cancelled_by']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
         ]
       }
       sale_items: {
@@ -303,6 +317,22 @@ export type Database = {
       register_inventory_movement: {
         Args: { p_product_id: string; p_type: MovementType; p_quantity: number; p_reason?: string }
         Returns: Database['public']['Tables']['inventory_movements']['Row']
+      }
+      create_sale: {
+        Args: {
+          p_items: { product_id: string; quantity: number }[]
+          p_payment_method: PaymentMethod
+          p_notes?: string
+        }
+        Returns: Database['public']['Tables']['sales']['Row']
+      }
+      cancel_sale: {
+        Args: { p_sale_id: string; p_reason: string }
+        Returns: Database['public']['Tables']['sales']['Row']
+      }
+      get_top_products: {
+        Args: { p_days?: number; p_limit?: number }
+        Returns: TopProduct[]
       }
       adjust_inventory: {
         Args: { p_product_id: string; p_new_stock: number; p_reason: string }
