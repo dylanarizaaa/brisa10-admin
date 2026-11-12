@@ -10,12 +10,3 @@ export interface RecentMovement {
   product_name: string
   user_name: string
 }
-
-export const movementTypeLabels: Record<MovementType, string> = {
-  entrada: 'Entrada',
-  salida: 'Salida',
-  ajuste: 'Ajuste',
-  venta: 'Venta',
-  cancelacion: 'Anulación de venta',
-  devolucion: 'Devolución',
-}

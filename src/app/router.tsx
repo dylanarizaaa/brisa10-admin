@@ -1,29 +1,31 @@
 import type { ReactNode } from 'react'
 import { createBrowserRouter, Navigate } from 'react-router'
-import { ModulePlaceholder } from '@/components/shared/module-placeholder'
-import { navigation } from '@/config/navigation'
 import { RequireAuth } from '@/features/auth/components/require-auth'
 import { LoginPage } from '@/features/auth/pages/login-page'
 import { CategoriesPage } from '@/features/categories/pages/categories-page'
 import { RequireAdmin } from '@/features/auth/components/require-admin'
 import { DashboardPage } from '@/features/dashboard/pages/dashboard-page'
 import { InventoryPage } from '@/features/inventory/pages/inventory-page'
+import { MovementsPage } from '@/features/movements/pages/movements-page'
 import { ProductDetailPage } from '@/features/products/pages/product-detail-page'
 import { ProductCreatePage, ProductEditPage } from '@/features/products/pages/product-form-page'
 import { ProductsPage } from '@/features/products/pages/products-page'
 import { NewSalePage } from '@/features/sales/pages/new-sale-page'
 import { SaleDetailPage } from '@/features/sales/pages/sale-detail-page'
 import { SalesPage } from '@/features/sales/pages/sales-page'
+import { SettingsPage } from '@/features/settings/pages/settings-page'
 import { AppLayout } from './layouts/app-layout'
 import { RouteError } from './route-error'
 
-/** Páginas ya implementadas; el resto de la navegación muestra un placeholder. */
+/** Página principal de cada módulo de la navegación. */
 const pages: Record<string, ReactNode> = {
   '/': <DashboardPage />,
   '/categorias': <CategoriesPage />,
   '/productos': <ProductsPage />,
   '/inventario': <InventoryPage />,
   '/ventas': <SalesPage />,
+  '/movimientos': <MovementsPage />,
+  '/configuracion': <SettingsPage />,
 }
 
 export const router = createBrowserRouter([
@@ -36,10 +38,7 @@ export const router = createBrowserRouter([
         path: '/',
         element: <AppLayout />,
         children: [
-          ...navigation.map((item) => ({
-            path: item.path,
-            element: pages[item.path] ?? <ModulePlaceholder title={item.title} phase={item.phase} />,
-          })),
+          ...Object.entries(pages).map(([path, element]) => ({ path, element })),
           {
             element: <RequireAdmin redirectTo="/productos" />,
             children: [

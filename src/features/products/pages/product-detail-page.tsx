@@ -1,4 +1,4 @@
-import { Pencil, Power, PowerOff } from 'lucide-react'
+import { Globe, GlobeLock, Pencil, Power, PowerOff, Star } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { Link, useParams } from 'react-router'
 import { ConfirmDialog } from '@/components/shared/confirm-dialog'
@@ -10,7 +10,7 @@ import { formatCOP, formatDateTime } from '@/lib/format'
 import { ProductImages } from '../components/product-images'
 import { BackLink, ProductLoader } from '../components/product-page-shell'
 import { StockBadge } from '../components/stock-badge'
-import { useProduct, useSetProductActive } from '../hooks/use-products'
+import { useProduct, useSetProductActive, useSetProductPublished } from '../hooks/use-products'
 import type { ProductDetail } from '../types'
 
 function Detail({ label, children }: { label: string; children: ReactNode }) {
@@ -25,6 +25,7 @@ function Detail({ label, children }: { label: string; children: ReactNode }) {
 function ProductDetailContent({ product }: { product: ProductDetail }) {
   const { isAdmin } = useCurrentUser()
   const setActive = useSetProductActive()
+  const setPublished = useSetProductPublished()
   const [confirmDeactivate, setConfirmDeactivate] = useState(false)
 
   return (
@@ -32,6 +33,14 @@ function ProductDetailContent({ product }: { product: ProductDetail }) {
       <PageHeader title={product.name} description={product.category_name}>
         {isAdmin && (
           <>
+            <Button
+              variant="outline"
+              disabled={setPublished.isPending}
+              onClick={() => setPublished.mutate({ id: product.id, isPublished: !product.is_published })}
+            >
+              {product.is_published ? <GlobeLock /> : <Globe />}
+              {product.is_published ? 'Quitar de la tienda' : 'Publicar'}
+            </Button>
             <Button
               variant="outline"
               disabled={setActive.isPending}
@@ -59,7 +68,22 @@ function ProductDetailContent({ product }: { product: ProductDetail }) {
           {product.is_active ? 'Activo' : 'Inactivo'}
         </Badge>
         <StockBadge status={product.stock_status} />
+        <Badge variant={product.is_published ? 'secondary' : 'outline'}>
+          {product.is_published ? <Globe /> : <GlobeLock />}
+          {product.is_published ? 'Publicado en la tienda virtual' : 'No publicado'}
+        </Badge>
+        {product.is_featured && (
+          <Badge variant="secondary">
+            <Star />
+            Destacado
+          </Badge>
+        )}
       </div>
+      {product.is_published && !product.is_active && (
+        <p className="text-sm text-muted-foreground">
+          Está marcado para publicarse, pero no aparece en la tienda virtual mientras esté inactivo.
+        </p>
+      )}
 
       <dl className="grid grid-cols-2 gap-x-6 gap-y-5 rounded-lg border p-4 sm:grid-cols-3 lg:grid-cols-4">
         <Detail label="Precio de venta">{formatCOP(product.price)}</Detail>

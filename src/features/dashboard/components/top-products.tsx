@@ -9,7 +9,7 @@ export function TopProducts() {
   const top = useTopProducts()
 
   return (
-    <section className="flex flex-col rounded-lg border bg-card">
+    <section className="flex min-w-0 flex-col rounded-lg border bg-card">
       <div className="border-b px-4 py-3">
         <h2 className="font-medium">Productos más vendidos</h2>
         <p className="text-sm text-muted-foreground">Últimos {TOP_PRODUCTS_DAYS} días.</p>

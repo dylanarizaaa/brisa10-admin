@@ -1,5 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
-import { getDashboardSummary, getRecentMovements, getTopProducts } from '../services/dashboard-service'
+import {
+  getDashboardSummary,
+  getRecentMovements,
+  getSalesByDay,
+  getTopProducts,
+} from '../services/dashboard-service'
 
 /** Prefijo común: otras features lo invalidan al cambiar productos, inventario o ventas. */
 export const dashboardKey = ['dashboard'] as const
@@ -18,5 +23,14 @@ export function useTopProducts() {
   return useQuery({
     queryKey: [...dashboardKey, 'top-products', TOP_PRODUCTS_DAYS],
     queryFn: () => getTopProducts(TOP_PRODUCTS_DAYS, 5),
+  })
+}
+
+export const SALES_CHART_DAYS = 14
+
+export function useSalesByDay() {
+  return useQuery({
+    queryKey: [...dashboardKey, 'sales-by-day', SALES_CHART_DAYS],
+    queryFn: () => getSalesByDay(SALES_CHART_DAYS),
   })
 }

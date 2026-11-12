@@ -1,18 +1,24 @@
 import { History } from 'lucide-react'
+import { Link } from 'react-router'
 import { EmptyState, ErrorState } from '@/components/shared/state-message'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatDateTime } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { useRecentMovements } from '../hooks/use-dashboard'
-import { movementTypeLabels } from '../types'
+import { movementTypeLabels } from '@/features/movements/types'
 
 export function RecentActivity() {
   const movements = useRecentMovements()
 
   return (
-    <section className="flex flex-col rounded-lg border bg-card">
+    <section className="flex min-w-0 flex-col rounded-lg border bg-card">
       <div className="border-b px-4 py-3">
-        <h2 className="font-medium">Actividad reciente</h2>
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="font-medium">Actividad reciente</h2>
+          <Link to="/movimientos" className="text-sm text-muted-foreground hover:text-foreground hover:underline">
+            Ver todo
+          </Link>
+        </div>
         <p className="text-sm text-muted-foreground">Últimos movimientos de inventario.</p>
       </div>
 

@@ -3,7 +3,10 @@
 Sistema administrativo para una tienda física: productos, categorías, inventario y ventas.
 Aplicación React que corre como web durante el desarrollo y se empaquetará con Tauri 2 para Windows.
 
-> **Estado:** fases 1 a 5 completas (base de datos, autenticación, dashboard, categorías, productos con fotografías, inventario y ventas). Los módulos funcionales se implementan por fases — ver [docs/PLAN.md](docs/PLAN.md).
+> **Estado:** fases 1 a 6 completas: toda la aplicación administrativa web. Falta el empaquetado con Tauri (fase 7). Los módulos funcionales se implementan por fases — ver [docs/PLAN.md](docs/PLAN.md).
+
+
+La tienda virtual pública vive en otro repositorio, [brisa10-catalog](https://github.com/dylanarizaaa/brisa10-catalog), y usa este mismo proyecto de Supabase. Aquí se publican los productos (interruptor **Publicar en la tienda virtual**) y se registran las ventas.
 
 ## Documentación
 
@@ -43,6 +46,14 @@ Cada fase que trae cambios de base de datos agrega un archivo nuevo; se aplica i
 | `20261111000003_product_list.sql` | 3 | Vista para listar, filtrar y buscar productos |
 | `20261111000004_inventory_movements.sql` | 4 | Funciones transaccionales de entrada, salida y ajuste de inventario |
 | `20261111000005_sales.sql` | 5 | Funciones para registrar y anular ventas, y productos más vendidos |
+| `20261111000006_history_reports_users.sql` | 6 | Vista del historial de movimientos, ventas por día y lista de usuarios |
+| `20261111000007_public_catalog.sql` | Etapa 2 | Catálogo público: slugs, productos destacados y funciones de lectura para la tienda virtual |
+
+### Usuarios
+
+- **Crear:** en Supabase, **Authentication → Users → Add user**, con *Auto Confirm User*. Aparece en la aplicación como operador.
+- **Rol y acceso:** en la aplicación, **Configuración → Usuarios** (solo administrador).
+- **Correo y contraseña:** se cambian en el panel de Supabase.
 
 Para cambiar un rol a mano: `update public.profiles set role = 'admin' where id = '<uuid del usuario>';`
 

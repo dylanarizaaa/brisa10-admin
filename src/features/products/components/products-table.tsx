@@ -1,4 +1,4 @@
-import { Eye, MoreHorizontal, Pencil, Power, PowerOff } from 'lucide-react'
+import { Eye, Globe, GlobeLock, MoreHorizontal, Pencil, Power, PowerOff, Star } from 'lucide-react'
 import { Link } from 'react-router'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -18,9 +18,10 @@ interface ProductsTableProps {
   products: Product[]
   canEdit: boolean
   onToggleActive: (product: Product) => void
+  onTogglePublished: (product: Product) => void
 }
 
-export function ProductsTable({ products, canEdit, onToggleActive }: ProductsTableProps) {
+export function ProductsTable({ products, canEdit, onToggleActive, onTogglePublished }: ProductsTableProps) {
   return (
     <Table>
       <TableHeader>
@@ -50,6 +51,16 @@ export function ProductsTable({ products, canEdit, onToggleActive }: ProductsTab
                       <Badge variant="outline" className="shrink-0">
                         Inactivo
                       </Badge>
+                    )}
+                    {product.is_published && (
+                      <Badge variant="secondary" className="shrink-0" title="Visible en la tienda virtual">
+                        <Globe />
+                        <span className="hidden sm:inline">Publicado</span>
+                        <span className="sr-only sm:hidden">Publicado</span>
+                      </Badge>
+                    )}
+                    {product.is_featured && (
+                      <Star className="size-3.5 shrink-0 fill-current text-amber-500" aria-label="Destacado" />
                     )}
                   </span>
                   {product.sku && <span className="truncate text-xs text-muted-foreground">{product.sku}</span>}
@@ -83,6 +94,10 @@ export function ProductsTable({ products, canEdit, onToggleActive }: ProductsTab
                           <Pencil />
                           Editar
                         </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => onTogglePublished(product)}>
+                        {product.is_published ? <GlobeLock /> : <Globe />}
+                        {product.is_published ? 'Quitar de la tienda virtual' : 'Publicar en la tienda virtual'}
                       </DropdownMenuItem>
                       <DropdownMenuItem onSelect={() => onToggleActive(product)}>
                         {product.is_active ? <PowerOff /> : <Power />}

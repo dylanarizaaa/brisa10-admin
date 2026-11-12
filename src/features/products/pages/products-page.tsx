@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils'
 import { ProductFiltersBar } from '../components/product-filters-bar'
 import { ProductsTable } from '../components/products-table'
 import { useProductFilters } from '../hooks/use-product-filters'
-import { useProducts, useSetProductActive } from '../hooks/use-products'
+import { useProducts, useSetProductActive, useSetProductPublished } from '../hooks/use-products'
 import { PRODUCTS_PAGE_SIZE, type Product } from '../types'
 
 export function ProductsPage() {
@@ -20,6 +20,7 @@ export function ProductsPage() {
   const { filters, setParam, hasFilters } = useProductFilters()
   const products = useProducts(filters)
   const setActive = useSetProductActive()
+  const setPublished = useSetProductPublished()
   const [toDeactivate, setToDeactivate] = useState<Product | null>(null)
 
   const total = products.data?.total ?? 0
@@ -92,7 +93,11 @@ export function ProductsPage() {
         ) : (
           // Atenuado mientras llega la página siguiente o el nuevo filtro.
           <div className={cn(products.isPlaceholderData && 'opacity-60 transition-opacity')}>
-            <ProductsTable products={items} canEdit={isAdmin} onToggleActive={handleToggleActive} />
+            <ProductsTable products={items} canEdit={isAdmin} onToggleActive={handleToggleActive}
+              onTogglePublished={(product) =>
+                setPublished.mutate({ id: product.id, isPublished: !product.is_published })
+              }
+            />
             <TablePagination
               page={filters.page}
               pageCount={pageCount}

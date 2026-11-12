@@ -1,7 +1,7 @@
 # Plan de trabajo
 
 Sistema administrativo para tienda física (decoración, cerámicas, peluches, regalos).
-Alcance de esta etapa: **solo la aplicación administrativa**. Sin catálogo público, sin pagos electrónicos, sin AWS.
+Alcance: la aplicación administrativa (fases 0–7) y, en la etapa 2, lo que la tienda virtual necesita de este repositorio. Sin pagos electrónicos, sin AWS.
 
 Cada fase deja el proyecto funcional y se valida antes de pasar a la siguiente.
 
@@ -14,9 +14,10 @@ Cada fase deja el proyecto funcional y se valida antes de pasar a la siguiente.
 | 2 | Dashboard y categorías | ✅ Hecho |
 | 3 | Productos e imágenes | ✅ Hecho |
 | 4 | Inventario transaccional | ✅ Hecho |
-| 5 | Ventas físicas | ✅ Hecho — pendiente de tu prueba contra Supabase |
-| 6 | Historial, reportes, permisos y configuración | ⏳ Siguiente |
-| 7 | Empaquetado con Tauri 2 | Pendiente |
+| 5 | Ventas físicas | ✅ Hecho |
+| 6 | Historial, reportes, permisos y configuración | ✅ Hecho — pendiente de tu prueba contra Supabase |
+| 7 | Empaquetado con Tauri 2 | ⏳ Pendiente |
+| E2 | Tienda virtual pública ([detalle](#etapa-2--tienda-virtual)) | ✅ Hecho — pendiente de tu prueba contra Supabase y del despliegue en Cloudflare |
 
 ## Paso 0 — Base del proyecto (este entregable)
 
@@ -68,15 +69,36 @@ Cada fase deja el proyecto funcional y se valida antes de pasar a la siguiente.
 
 ## Fase 6 — Historial, reportes y permisos
 
-- Historial de movimientos con filtros (producto, tipo, usuario, fechas).
-- Gráficos del dashboard (ventas por día, más vendidos).
-- Configuración: datos del negocio, umbral de bajo inventario, usuarios y roles.
-- Revisión completa de permisos admin/operador en interfaz y en RLS.
+- Historial de movimientos (vista `movement_list`) con filtros por producto, tipo, usuario y rango de fechas. Solo lectura.
+- Dashboard: gráfico de ingresos por día (últimos 14 días, con vista de tabla) y estado del inventario.
+- Configuración:
+  - **Negocio:** nombre, NIT, teléfono, dirección, correo y umbral de bajo inventario. Solo el administrador edita.
+  - **Usuarios** (solo administrador): cambiar rol, activar y desactivar. El alta de usuarios se hace en el panel de Supabase.
+  - **Mi cuenta:** cambiar el propio nombre.
+- Revisión de permisos: cada restricción de la interfaz tiene su equivalente en RLS o en las funciones RPC (matriz en [DATA_MODEL.md](./DATA_MODEL.md#permisos-por-rol)).
 
 ## Fase 7 — Tauri 2
 
 - `src-tauri/`, configuración de ventana, iconos y build del instalador para Windows.
 - Sin funcionalidades nativas adicionales.
+
+## Etapa 2 — Tienda virtual
+
+Catálogo público para clientes, en un repositorio aparte (`brisa10-catalog`, Astro) que comparte este proyecto de Supabase. Sin pagos ni cuentas de cliente: el pedido se envía por WhatsApp y **no descuenta inventario**; el descuento ocurre al registrar la venta aquí.
+
+El sitio (catálogo, detalle de producto, carrito, pedido por WhatsApp, SEO y guía de despliegue) está en [brisa10-catalog](https://github.com/dylanarizaaa/brisa10-catalog); su `README.md` documenta arquitectura, variables y despliegue.
+
+En este repositorio:
+
+- Migración `20261111000007_public_catalog.sql`: `slug` en productos y categorías, `products.is_featured` y las funciones de lectura pública (ver [modelo de datos](./DATA_MODEL.md#catálogo-público)).
+- Productos: interruptores "Publicar en la tienda virtual" y "Producto destacado" en el formulario, acción de publicar en la lista y el detalle, e indicadores de publicado y destacado. Solo administrador.
+
+Decisiones:
+
+1. **Funciones RPC en lugar de vista o RLS para `anon`:** RLS no oculta columnas y una vista deja la consulta en manos del cliente. Las funciones fijan columnas, búsqueda y tope de filas.
+2. **El pedido no se guarda en la base** en esta versión: se verifica con `check_public_cart` y viaja por WhatsApp.
+3. **Stock exacto nunca se publica:** solo `disponible`, `ultimas_unidades` o `agotado`.
+4. **Slug estable:** se genera al crear y no cambia con el nombre, para no romper enlaces compartidos.
 
 ## Decisiones tomadas
 
