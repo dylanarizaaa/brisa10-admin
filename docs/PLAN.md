@@ -17,7 +17,7 @@ Cada fase deja el proyecto funcional y se valida antes de pasar a la siguiente.
 | 5 | Ventas físicas | ✅ Hecho |
 | 6 | Historial, reportes, permisos y configuración | ✅ Hecho — pendiente de tu prueba contra Supabase |
 | 7 | Empaquetado con Tauri 2 | ⏳ Pendiente |
-| E2 | Tienda virtual pública ([detalle](#etapa-2--tienda-virtual)) | 🚧 En curso — base de datos y controles de publicación hechos |
+| E2 | Tienda virtual pública ([detalle](#etapa-2--tienda-virtual)) | ✅ Hecho — pendiente de tu prueba contra Supabase y del despliegue en Cloudflare |
 
 ## Paso 0 — Base del proyecto (este entregable)
 
@@ -85,6 +85,8 @@ Cada fase deja el proyecto funcional y se valida antes de pasar a la siguiente.
 ## Etapa 2 — Tienda virtual
 
 Catálogo público para clientes, en un repositorio aparte (`brisa10-catalog`, Astro) que comparte este proyecto de Supabase. Sin pagos ni cuentas de cliente: el pedido se envía por WhatsApp y **no descuenta inventario**; el descuento ocurre al registrar la venta aquí.
+
+El sitio (catálogo, detalle de producto, carrito, pedido por WhatsApp, SEO y guía de despliegue) está en [brisa10-catalog](https://github.com/dylanarizaaa/brisa10-catalog); su `README.md` documenta arquitectura, variables y despliegue.
 
 En este repositorio:
 

@@ -5,6 +5,9 @@ Aplicación React que corre como web durante el desarrollo y se empaquetará con
 
 > **Estado:** fases 1 a 6 completas: toda la aplicación administrativa web. Falta el empaquetado con Tauri (fase 7). Los módulos funcionales se implementan por fases — ver [docs/PLAN.md](docs/PLAN.md).
 
+
+La tienda virtual pública vive en otro repositorio, [brisa10-catalog](https://github.com/dylanarizaaa/brisa10-catalog), y usa este mismo proyecto de Supabase. Aquí se publican los productos (interruptor **Publicar en la tienda virtual**) y se registran las ventas.
+
 ## Documentación
 
 - [Plan de trabajo](docs/PLAN.md) — fases, estado y decisiones pendientes.
