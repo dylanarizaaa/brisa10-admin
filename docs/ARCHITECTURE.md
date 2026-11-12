@@ -10,7 +10,8 @@
 │  ── Tauri 2 en Windows       │        │  └─ Storage (fotos de productos)│
 └──────────────────────────────┘        └─────────────────────────────────┘
                                                       ▲
-                                 (etapa 2) Catálogo público, solo lectura
+                     Tienda virtual (repositorio brisa10-catalog, Astro)
+                     rol anon → solo funciones get_public_* / check_public_cart
 ```
 
 No hay servidor propio. El "backend" es PostgreSQL: las reglas críticas (stock nunca negativo, ventas atómicas, permisos por rol) viven en la base de datos mediante restricciones, RLS y funciones RPC. El frontend valida para dar buena experiencia, pero no es la fuente de verdad.
@@ -94,6 +95,7 @@ Reglas:
 - RLS activado en todas las tablas; sin sesión no se lee nada.
 - Rol (`admin` / `operador`) guardado en `profiles` y consultado por las políticas con las funciones `is_active_user()` e `is_admin()`. Un usuario con `is_active = false` no pasa ninguna política.
 - La interfaz oculta lo que el rol no puede hacer, pero la restricción efectiva está en RLS y en las RPC.
+- La tienda virtual usa el rol `anon`, que no tiene privilegios sobre ninguna tabla ni vista: solo puede ejecutar las funciones de lectura pública, que devuelven únicamente productos publicados y activos, sin stock exacto, costo ni datos internos.
 - El frontend usa únicamente la clave `anon`. La clave `service_role` nunca se incluye en el proyecto.
 
 ## Preparación para Tauri 2

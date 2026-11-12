@@ -22,6 +22,8 @@ function toRow(values: ProductValues) {
     category_id: values.categoryId,
     price: Number(values.price),
     min_stock: values.minStock === '' ? null : Number(values.minStock),
+    is_published: values.isPublished,
+    is_featured: values.isFeatured,
   }
 }
 
@@ -124,4 +126,18 @@ export async function updateProduct(id: string, values: ProductValues): Promise<
 export async function setProductActive(id: string, isActive: boolean): Promise<void> {
   const { error } = await getSupabase().from('products').update({ is_active: isActive }).eq('id', id)
   if (error) throw toAppError(error, 'No se pudo cambiar el estado del producto')
+}
+
+/** Publica o retira el producto de la tienda virtual, o lo marca como destacado. */
+export async function setProductCatalog(
+  id: string,
+  changes: { is_published?: boolean; is_featured?: boolean },
+): Promise<void> {
+  const { error } = await getSupabase().from('products').update(changes).eq('id', id)
+  if (error) {
+    throw toAppError(error, 'No se pudo cambiar la publicación del producto', {
+      // Columna is_featured inexistente: falta la migración del catálogo.
+      PGRST204: 'Falta aplicar la migración del catálogo en Supabase (20261111000007_public_catalog.sql)',
+    })
+  }
 }

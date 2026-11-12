@@ -44,6 +44,7 @@ Cada fase que trae cambios de base de datos agrega un archivo nuevo; se aplica i
 | `20261111000004_inventory_movements.sql` | 4 | Funciones transaccionales de entrada, salida y ajuste de inventario |
 | `20261111000005_sales.sql` | 5 | Funciones para registrar y anular ventas, y productos más vendidos |
 | `20261111000006_history_reports_users.sql` | 6 | Vista del historial de movimientos, ventas por día y lista de usuarios |
+| `20261111000007_public_catalog.sql` | Etapa 2 | Catálogo público: slugs, productos destacados y funciones de lectura para la tienda virtual |
 
 ### Usuarios
 

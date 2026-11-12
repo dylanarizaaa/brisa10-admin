@@ -27,6 +27,10 @@ export const productSchema = z.object({
     .pipe(wholeNumber('El precio')),
   cost: optionalWholeNumber('El costo'),
   minStock: optionalWholeNumber('El stock mínimo'),
+  /** Visible en la tienda virtual (además debe estar activo). */
+  isPublished: z.boolean(),
+  /** Aparece en la sección de destacados de la tienda virtual. */
+  isFeatured: z.boolean(),
   /** Solo al crear: se registra como una entrada de inventario. */
   initialStock: optionalWholeNumber('Las existencias iniciales'),
 })

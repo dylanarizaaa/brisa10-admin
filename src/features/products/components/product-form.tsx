@@ -6,6 +6,7 @@ import { Link } from 'react-router'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { useCategories } from '@/features/categories/hooks/use-categories'
@@ -70,6 +71,8 @@ export function ProductForm({ product, submitting, error, cancelTo, onSubmit }: 
       cost: product?.cost != null ? String(product.cost) : '',
       minStock: product?.min_stock != null ? String(product.min_stock) : '',
       initialStock: '',
+      isPublished: product?.is_published ?? false,
+      isFeatured: product?.is_featured ?? false,
     },
   })
 
@@ -187,6 +190,39 @@ export function ProductForm({ product, submitting, error, cancelTo, onSubmit }: 
           </Field>
         </div>
       )}
+
+      <fieldset className="flex flex-col gap-4 rounded-lg border p-4">
+        <legend className="px-1 text-sm font-medium">Tienda virtual</legend>
+        {(
+          [
+            {
+              name: 'isPublished',
+              label: 'Publicar en la tienda virtual',
+              hint: 'Los clientes lo verán en el catálogo público mientras esté activo. Agrega al menos una fotografía.',
+            },
+            {
+              name: 'isFeatured',
+              label: 'Producto destacado',
+              hint: 'Aparece en la sección de destacados de la página de inicio.',
+            },
+          ] as const
+        ).map((option) => (
+          <Controller
+            key={option.name}
+            control={control}
+            name={option.name}
+            render={({ field }) => (
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex flex-col gap-1">
+                  <Label htmlFor={`product-${option.name}`}>{option.label}</Label>
+                  <p className="text-xs text-muted-foreground">{option.hint}</p>
+                </div>
+                <Switch id={`product-${option.name}`} checked={field.value} onCheckedChange={field.onChange} />
+              </div>
+            )}
+          />
+        ))}
+      </fieldset>
 
       {error && (
         <p role="alert" className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">

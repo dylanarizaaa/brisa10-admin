@@ -14,6 +14,7 @@ import {
   getProduct,
   listProducts,
   setProductActive,
+  setProductCatalog,
   updateProduct,
 } from '../services/product-service'
 import type { ProductFilters, ProductImage } from '../types'
@@ -76,6 +77,32 @@ export function useSetProductActive() {
       return invalidateProducts(queryClient)
     },
     onError: (error) => toast.error(error.message),
+  })
+}
+
+export function useSetProductPublished() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, isPublished }: { id: string; isPublished: boolean }) =>
+      setProductCatalog(id, { is_published: isPublished }),
+    onSuccess: (_data, { isPublished }) => {
+      toast.success(isPublished ? 'Producto publicado en la tienda virtual' : 'Producto retirado de la tienda virtual')
+    },
+    onError: (error) => toast.error(error.message),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: productsKey }),
+  })
+}
+
+export function useSetProductFeatured() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, isFeatured }: { id: string; isFeatured: boolean }) =>
+      setProductCatalog(id, { is_featured: isFeatured }),
+    onSuccess: (_data, { isFeatured }) => {
+      toast.success(isFeatured ? 'Producto marcado como destacado' : 'Producto quitado de destacados')
+    },
+    onError: (error) => toast.error(error.message),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: productsKey }),
   })
 }
 

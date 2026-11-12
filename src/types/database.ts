@@ -68,6 +68,7 @@ export type Database = {
         Row: {
           id: string
           name: string
+          slug: string
           description: string | null
           is_active: boolean
           created_at: string
@@ -97,6 +98,8 @@ export type Database = {
           min_stock: number | null
           is_active: boolean
           is_published: boolean
+          is_featured: boolean
+          slug: string
           created_by: string | null
           created_at: string
           updated_at: string
@@ -110,6 +113,7 @@ export type Database = {
           min_stock?: number | null
           is_active?: boolean
           is_published?: boolean
+          is_featured?: boolean
         }
         Update: {
           sku?: string | null
@@ -120,6 +124,7 @@ export type Database = {
           min_stock?: number | null
           is_active?: boolean
           is_published?: boolean
+          is_featured?: boolean
         }
         Relationships: [
           {
@@ -340,6 +345,8 @@ export type Database = {
           stock_status: StockStatus
           is_active: boolean
           is_published: boolean
+          is_featured: boolean
+          slug: string
           created_at: string
           updated_at: string
           main_image_path: string | null
