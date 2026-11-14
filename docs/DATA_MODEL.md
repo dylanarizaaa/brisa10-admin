@@ -232,23 +232,24 @@ RLS activado en todas las tablas. Dos funciones auxiliares: `is_active_user()` y
 
 ## Catálogo público
 
-Migración `20261111000007_public_catalog.sql`. El rol `anon` (tienda virtual) sigue sin privilegios sobre tablas y vistas; solo ejecuta estas funciones `SECURITY DEFINER`, que leen de la vista interna `public_products` (productos con `is_published and is_active`).
+Migraciones `20261111000007_public_catalog.sql` y `20261111000008_catalog_editorial.sql`. El rol `anon` (tienda virtual) sigue sin privilegios sobre tablas y vistas; solo ejecuta estas funciones `SECURITY DEFINER`, que leen de la vista interna `public_products` (productos con `is_published and is_active`).
 
 | Función | Devuelve |
 |---------|----------|
 | `get_public_catalog(p_search, p_category, p_sort, p_featured, p_limit, p_offset)` | `{ items, total, limit, offset }`. Búsqueda por nombre sin tildes, filtro por slug de categoría, orden `recientes` / `precio_asc` / `precio_desc`. Máximo 48 filas por llamada. |
 | `get_public_product(p_slug)` | Detalle con descripción, galería (`images`) y hasta 4 relacionados de la misma categoría; `null` si no es público. |
-| `get_public_categories()` | Categorías activas con al menos un producto público, con conteo y foto de portada. |
+| `get_public_categories()` | Categorías activas con al menos un producto público, con descripción, conteo y foto de portada. |
 | `get_public_business()` | Nombre, teléfono, dirección y correo del negocio. |
 | `check_public_cart(p_items)` | Para `[{product_id, quantity}]` (máx. 50 líneas, cantidad 1–99): precio vigente y si la cantidad está disponible. No registra nada ni descuenta inventario. |
 
-Campos públicos de un producto: `id`, `slug`, `name`, `price`, `availability`, `is_featured`, `category_name`, `category_slug`, `main_image_path` (y `description`, `images`, `created_at`, `updated_at` en el detalle). **Nunca** salen `stock`, `min_stock`, `sku`, costo ni `created_by`.
+Campos públicos de un producto: `id`, `slug`, `name`, `price`, `availability`, `is_featured`, `category_name`, `category_slug`, `main_image_path`, `second_image_path` (desde la migración 8; la tienda la muestra al pasar el cursor) (y `description`, `images`, `created_at`, `updated_at` en el detalle). **Nunca** salen `stock`, `min_stock`, `sku`, costo ni `created_by`.
 
 `availability`: `agotado` (sin existencias), `ultimas_unidades` (existencias ≤ mínimo efectivo) o `disponible`.
 
 Notas:
 
 - Despublicar o desactivar un producto lo retira de todas las funciones de inmediato.
+- La descripción de una categoría (editable en Categorías) aparece en las secciones editoriales de la tienda; si está vacía, la tienda usa un texto genérico.
 - Un producto público de una categoría inactiva sigue visible, pero su categoría no aparece en `get_public_categories()`.
 - `check_public_cart` responde si una cantidad está disponible, así que con consultas repetidas se puede deducir el stock hasta 99 unidades; es inherente a validar cantidades.
 - Las fotos se sirven por la URL pública del bucket `product-images` (no pasa por RLS). `anon` no puede listar el bucket; la foto de un producto no publicado solo es accesible para quien conozca su ruta exacta.

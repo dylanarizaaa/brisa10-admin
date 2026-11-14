@@ -15,8 +15,8 @@ Cada fase deja el proyecto funcional y se valida antes de pasar a la siguiente.
 | 3 | Productos e imágenes | ✅ Hecho |
 | 4 | Inventario transaccional | ✅ Hecho |
 | 5 | Ventas físicas | ✅ Hecho |
-| 6 | Historial, reportes, permisos y configuración | ✅ Hecho — pendiente de tu prueba contra Supabase |
-| 7 | Empaquetado con Tauri 2 | ⏳ Pendiente |
+| 6 | Historial, reportes, permisos y configuración | ✅ Hecho |
+| 7 | Empaquetado con Tauri 2 | ✅ Hecho — pendiente de tu prueba del instalador en Windows |
 | E2 | Tienda virtual pública ([detalle](#etapa-2--tienda-virtual)) | ✅ Hecho — pendiente de tu prueba contra Supabase y del despliegue en Cloudflare |
 
 ## Paso 0 — Base del proyecto (este entregable)
@@ -79,8 +79,12 @@ Cada fase deja el proyecto funcional y se valida antes de pasar a la siguiente.
 
 ## Fase 7 — Tauri 2
 
-- `src-tauri/`, configuración de ventana, iconos y build del instalador para Windows.
-- Sin funcionalidades nativas adicionales.
+- `src-tauri/`: proyecto Tauri 2 mínimo, sin comandos ni plugins nativos. Ventana maximizada, icono propio y política de seguridad (CSP) que solo permite el código de la app y Supabase.
+- Instalador NSIS en español, por usuario (sin permisos de administrador).
+- GitHub Actions (`.github/workflows/windows-installer.yml`) compila en Windows: instalador de prueba en cada pull request que toca la app de escritorio, y borrador de versión con el instalador al crear una etiqueta `v*` o desde **Run workflow**.
+- La versión sale de `package.json`.
+- Guía de uso en [DESKTOP.md](./DESKTOP.md).
+- Fuera de alcance por ahora: actualizaciones automáticas y firma de código.
 
 ## Etapa 2 — Tienda virtual
 

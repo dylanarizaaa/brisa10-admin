@@ -1,0 +1,28 @@
+[package]
+name = "brisa10-admin"
+# La versión que ve el usuario (instalador, "Acerca de") sale de package.json; ver tauri.conf.json.
+version = "0.1.0"
+description = "Brisa10 Admin: aplicación de escritorio del sistema de gestión comercial"
+authors = ["Brisa10"]
+license = ""
+repository = ""
+edition = "2024"
+rust-version = "1.90"
+
+[lib]
+name = "brisa10_admin_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.7.4", features = [] }
+
+[dependencies]
+tauri = { version = "2.12.5", features = [] }
+
+# Binario más pequeño para el instalador. Compila más lento, pero solo afecta al build de versiones.
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+panic = "abort"
+strip = true

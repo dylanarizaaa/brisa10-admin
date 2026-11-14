@@ -17,5 +17,7 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
+    // Los cambios en el proyecto de Rust no deben recargar la interfaz.
+    watch: { ignored: ['**/src-tauri/**'] },
   },
 })
