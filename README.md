@@ -59,6 +59,23 @@ Cada fase que trae cambios de base de datos agrega un archivo nuevo; se aplica i
 
 Para cambiar un rol a mano: `update public.profiles set role = 'admin' where id = '<uuid del usuario>';`
 
+## Empezar de cero (borrar los datos de prueba)
+
+Antes de operar de verdad, `supabase/maintenance/reset_business_data.sql` deja el sistema vacío de datos de prueba. **Borra para siempre** ventas, movimientos de inventario, productos, costos y registros de fotografías, y reinicia la numeración de ventas. **Conserva** los usuarios y sus roles, los datos del negocio y el umbral de bajo inventario (Configuración), y toda la estructura de la base de datos.
+
+No está en `supabase/migrations/` a propósito: no es una migración y no debe aplicarse junto con ellas.
+
+1. **Respaldo (opcional):** si algún dato te interesa, ejecuta un `select * from public.products` (o `sales`, `inventory_movements`) en el SQL Editor y descarga el resultado como CSV.
+2. **Abre el script** en el SQL Editor (New query, pega el contenido de `supabase/maintenance/reset_business_data.sql`).
+3. **Ajusta las dos opciones** del bloque `OPCIONES`, marcadas con `←`:
+   - `v_confirmacion`: cámbialo de `'NO'` a `'BORRAR'`. Mientras diga `'NO'`, el script se niega a borrar.
+   - `v_reiniciar_categorias`: `false` conserva tus categorías; `true` las borra todas y deja solo las seis iniciales.
+4. **Run.** El resultado muestra una fila con todo en cero (y los usuarios conservados). En la pestaña de mensajes verás cuántos registros se borraron.
+5. **Borra las fotografías de prueba:** Storage → bucket `product-images` → selecciona las carpetas → Delete. Desde SQL no se pueden borrar los archivos, solo sus registros, así que sin este paso quedan archivos huérfanos ocupando espacio.
+6. **Revisa los usuarios de prueba** en Authentication → Users: elimina o cambia la contraseña de los que no vayas a usar.
+
+El script es seguro de ejecutar más de una vez, y se niega a continuar si no hay ningún administrador activo.
+
 ## Scripts
 
 | Comando | Descripción |
