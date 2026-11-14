@@ -1,0 +1,146 @@
+# Genera el instalador de Brisa10 Admin para Windows (.exe) con Tauri.
+#
+# Cuándo se ejecuta:
+#   - Al subir una etiqueta de versión (v0.1.0, v0.2.0, …): crea un BORRADOR de versión (Release)
+#     con el instalador adjunto. Se revisa y se publica a mano.
+#   - A mano, desde la pestaña Actions ("Run workflow"): genera el instalador como artefacto
+#     descargable; si se marca "crear_version", además crea el borrador de versión.
+#   - En pull requests que cambian la aplicación de escritorio: genera el instalador como
+#     artefacto, para probarlo antes de fusionar.
+#
+# Requiere dos secrets del repositorio (Settings → Secrets and variables → Actions):
+#   VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY. Ver README → "Aplicación de escritorio".
+
+name: Instalador de Windows
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      crear_version:
+        description: 'Crear también el borrador de versión (Release) con la versión de package.json'
+        type: boolean
+        default: false
+  pull_request:
+    paths:
+      - 'src-tauri/**'
+      - '.github/workflows/windows-installer.yml'
+      - 'package.json'
+      - 'package-lock.json'
+
+permissions:
+  # Necesario para crear la etiqueta y el borrador de versión.
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # En pull requests, un push nuevo cancela el build anterior; las versiones nunca se cancelan.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  windows:
+    name: Compilar instalador
+    runs-on: windows-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v7
+
+      - name: Verificar configuración
+        id: config
+        shell: bash
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          EVENTO: ${{ github.event_name }}
+          ETIQUETA: ${{ github.ref_name }}
+          CREAR_VERSION: ${{ inputs.crear_version }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${VITE_SUPABASE_URL:-}" ] || [ -z "${VITE_SUPABASE_ANON_KEY:-}" ]; then
+            echo "::error title=Faltan secrets::Configura VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY en Settings → Secrets and variables → Actions. Sin ellos el instalador abriría una pantalla de configuración."
+            exit 1
+          fi
+
+          case "$VITE_SUPABASE_URL" in
+            https://*.supabase.co|https://*.supabase.co/) ;;
+            *)
+              echo "::error title=URL de Supabase no admitida::VITE_SUPABASE_URL debe ser https://<proyecto>.supabase.co. La política de seguridad de la app de escritorio (src-tauri/tauri.conf.json → csp) solo permite conectarse a *.supabase.co; si usas un dominio propio, agrégalo allí."
+              exit 1
+              ;;
+          esac
+
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+          PUBLICAR=false
+          if [ "$EVENTO" = "push" ]; then
+            if [ "$ETIQUETA" != "v$VERSION" ]; then
+              echo "::error title=Versión no coincide::La etiqueta es $ETIQUETA pero package.json tiene la versión $VERSION. La etiqueta debe ser v$VERSION (usa: npm version patch && git push --follow-tags)."
+              exit 1
+            fi
+            PUBLICAR=true
+          elif [ "$EVENTO" = "workflow_dispatch" ] && [ "${CREAR_VERSION:-}" = "true" ]; then
+            if git ls-remote --exit-code --tags origin "refs/tags/v$VERSION" > /dev/null; then
+              echo "::error title=La versión ya existe::Ya existe la etiqueta v$VERSION. Sube la versión en package.json (campo \"version\") antes de crear una versión nueva."
+              exit 1
+            fi
+            PUBLICAR=true
+          fi
+          echo "publicar=$PUBLICAR" >> "$GITHUB_OUTPUT"
+          echo "Versión $VERSION · crear borrador de versión: $PUBLICAR"
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Caché de compilación de Rust
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Compilar la aplicación y el instalador
+        uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Vite incrusta estas variables en la interfaz durante el build.
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        with:
+          # Sin etiqueta ni nombre, la acción solo compila (pull requests y builds de prueba).
+          tagName: ${{ steps.config.outputs.publicar == 'true' && 'v__VERSION__' || '' }}
+          releaseName: ${{ steps.config.outputs.publicar == 'true' && 'Brisa10 Admin v__VERSION__' || '' }}
+          releaseCommitish: ${{ github.sha }}
+          releaseDraft: true
+          prerelease: false
+          uploadUpdaterJson: false
+          releaseBody: |
+            Instalador de Brisa10 Admin para Windows 10 y 11.
+
+            **Cómo instalar**
+            1. En **Assets**, descarga el archivo que termina en `_x64-setup.exe`.
+            2. Ábrelo. Si Windows muestra «Windows protegió su equipo», pulsa **Más información** → **Ejecutar de todas formas**. El aviso aparece porque el instalador no está firmado con un certificado comercial.
+            3. Sigue el asistente. No requiere permisos de administrador.
+
+            Para actualizar, instala la versión nueva encima de la anterior: la sesión y los datos se conservan.
+            La aplicación necesita conexión a internet.
+
+      - name: Guardar el instalador como artefacto
+        uses: actions/upload-artifact@v7
+        with:
+          name: brisa10-admin-${{ steps.config.outputs.version }}-windows
+          path: src-tauri/target/release/bundle/nsis/*-setup.exe
+          if-no-files-found: error
+          retention-days: 30

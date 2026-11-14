@@ -1,9 +1,9 @@
 # Brisa10 Admin
 
 Sistema administrativo para una tienda física: productos, categorías, inventario y ventas.
-Aplicación React que corre como web durante el desarrollo y se empaquetará con Tauri 2 para Windows.
+Aplicación React que funciona en el navegador y como aplicación de escritorio para Windows (Tauri 2).
 
-> **Estado:** fases 1 a 6 completas: toda la aplicación administrativa web. Falta el empaquetado con Tauri (fase 7). Los módulos funcionales se implementan por fases — ver [docs/PLAN.md](docs/PLAN.md).
+> **Estado:** fases 1 a 7 completas: aplicación administrativa web y su instalador para Windows. Detalle por fases en [docs/PLAN.md](docs/PLAN.md).
 
 
 La tienda virtual pública vive en otro repositorio, [brisa10-catalog](https://github.com/dylanarizaaa/brisa10-catalog), y usa este mismo proyecto de Supabase. Aquí se publican los productos (interruptor **Publicar en la tienda virtual**) y se registran las ventas.
@@ -13,6 +13,7 @@ La tienda virtual pública vive en otro repositorio, [brisa10-catalog](https://g
 - [Plan de trabajo](docs/PLAN.md) — fases, estado y decisiones pendientes.
 - [Arquitectura](docs/ARCHITECTURE.md) — capas, estructura de carpetas y decisiones técnicas.
 - [Modelo de datos](docs/DATA_MODEL.md) — tablas, funciones RPC y permisos.
+- [Aplicación de escritorio](docs/DESKTOP.md) — cómo generar, publicar e instalar el instalador de Windows.
 
 ## Requisitos
 
@@ -66,6 +67,8 @@ Para cambiar un rol a mano: `update public.profiles set role = 'admin' where id 
 | `npm run build` | Verificación de tipos y build de producción en `dist/` |
 | `npm run preview` | Sirve el build de producción |
 | `npm run lint` | Análisis estático con oxlint |
+| `npm run desktop:dev` | Aplicación de escritorio en desarrollo (requiere Rust; ver [docs/DESKTOP.md](docs/DESKTOP.md)) |
+| `npm run desktop:build` | Instalador de Windows local (requiere Rust y Windows) |
 
 ## Variables de entorno
 
@@ -75,6 +78,16 @@ Para cambiar un rol a mano: `update public.profiles set role = 'admin' where id 
 | `VITE_SUPABASE_ANON_KEY` | Clave pública `anon` |
 
 Nunca usar la clave `service_role` en este proyecto: todo lo que empieza por `VITE_` queda en el bundle.
+
+## Aplicación de escritorio (Windows)
+
+El instalador `.exe` se genera en GitHub Actions; no hace falta instalar nada en tu computador. Resumen:
+
+1. **Una vez:** en GitHub → Settings → Secrets and variables → Actions, crea los secrets `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` con los mismos valores de tu `.env`.
+2. **Instalador de prueba:** cada pull request que cambia `src-tauri/` genera el instalador como artefacto descargable.
+3. **Versión:** en Actions → **Instalador de Windows** → **Run workflow** con **crear_version**, o en la terminal `npm version patch && git push --follow-tags`. Se crea un borrador en **Releases** con el instalador; revísalo y publícalo.
+
+La guía completa, con la solución de problemas, está en [docs/DESKTOP.md](docs/DESKTOP.md).
 
 ## Agregar componentes de interfaz
 

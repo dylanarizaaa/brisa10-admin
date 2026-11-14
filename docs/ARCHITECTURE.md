@@ -56,7 +56,12 @@ brisa10-admin/
 │  ├─ hooks/                  Hooks genéricos
 │  ├─ lib/                    Cliente Supabase, QueryClient, formato COP/fechas
 │  └─ types/                  Tipos globales (esquema generado de la BD)
-└─ src-tauri/                 (fase 7) Proyecto Tauri
+├─ src-tauri/                 Aplicación de escritorio (Tauri 2)
+│  ├─ tauri.conf.json         Ventana, CSP, instalador NSIS
+│  ├─ capabilities/           Permisos de la ventana (solo los básicos)
+│  ├─ icons/                  Iconos generados desde app-icon.png
+│  └─ src/                    Punto de entrada en Rust (sin lógica propia)
+└─ .github/workflows/         Build del instalador de Windows
 ```
 
 Módulos en `features/`: `auth`, `dashboard`, `categories`, `products`, `inventory`, `sales`, `movements`, `settings`. Cada subcarpeta se crea solo cuando el módulo la necesita.
@@ -98,12 +103,21 @@ Reglas:
 - La tienda virtual usa el rol `anon`, que no tiene privilegios sobre ninguna tabla ni vista: solo puede ejecutar las funciones de lectura pública, que devuelven únicamente productos publicados y activos, sin stock exacto, costo ni datos internos.
 - El frontend usa únicamente la clave `anon`. La clave `service_role` nunca se incluye en el proyecto.
 
-## Preparación para Tauri 2
+## Aplicación de escritorio (Tauri 2)
 
-- La interfaz es una SPA estándar sin dependencias de APIs de escritorio; Tauri solo la envuelve.
-- `vite.config.ts` ya usa puerto fijo (`5173`, `strictPort`) y `clearScreen: false`, que es lo que espera el CLI de Tauri.
-- Si en el futuro se necesita algo nativo (impresión de recibos, por ejemplo), se aislará en `src/lib/platform/` con una implementación web y otra Tauri, para que los módulos no importen `@tauri-apps/*` directamente.
-- La sesión de Supabase se guarda en `localStorage`, que funciona igual en el WebView de Tauri.
+- La interfaz es la misma SPA; Tauri solo la envuelve en una ventana con WebView2. No hay comandos nativos ni plugins, y ningún módulo importa `@tauri-apps/*`.
+- Si en el futuro se necesita algo nativo (impresión de recibos, por ejemplo), se aislará en `src/lib/platform/` con una implementación web y otra Tauri.
+- `vite.config.ts` usa puerto fijo (`5173`, `strictPort`), `clearScreen: false` e ignora `src-tauri/` en el modo de desarrollo, como espera el CLI de Tauri.
+- La sesión de Supabase se guarda en `localStorage`, que WebView2 conserva entre reinicios y actualizaciones (el identificador `com.brisa10.admin` no debe cambiar).
+- Tauri responde con `index.html` a cualquier ruta desconocida, así que `createBrowserRouter` funciona igual que en la web.
+
+| Decisión | Motivo |
+|----------|--------|
+| CSP explícita: código propio + `*.supabase.co` | Si hubiera un XSS, no podría cargar scripts externos ni enviar datos a otros dominios. `style-src` permite estilos en línea (los inyectan Sonner y Radix); por eso `dangerousDisableAssetCspModification: ["style-src"]`, para que Tauri no agregue nonces que anularían `'unsafe-inline'`. |
+| Instalador NSIS por usuario | No pide permisos de administrador; un solo archivo `.exe`. |
+| Build en GitHub Actions | Reproducible y sin instalar Rust ni Visual Studio en el equipo del negocio; gratis en repositorios públicos. |
+| Versión única en `package.json` | `tauri.conf.json` la lee de allí; `npm version` crea commit y etiqueta coherentes. |
+| Sin actualizador ni firma de código | Evita gestionar claves y certificados en la primera iteración; documentado como pendiente. |
 
 ## Convenciones
 
